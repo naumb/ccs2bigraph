@@ -7,5 +7,5 @@ class Parser:
     def __init__(self):
         print("I am a new Parser")
 
-    def read():
+    def read(self):
         pass
