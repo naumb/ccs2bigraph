@@ -231,8 +231,39 @@ class Complex_Grammar_Test(unittest.TestCase):
         self.assertEqual(exp, act)
 
     def test_complex_process(self):
-        inp = r"Testcase = (a.'b.One)[x/y] + ('a.(b.Two[x/y])) \ L | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \ {a, b, c};"
-        exp = e.NilProcess() # TODO
+        inp = "Testcase = (a.'b.One)[x/y] + ('a.(b.Two[x/y])) \ L | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \ {a, b, c};"
+        exp = e.ProcessAssignment(
+            e.NamedProcess("Testcase"),
+            e.ParallelProcesses([
+                e.AlternativeProcesses([
+                    e.RenamingProcess(
+                        e.PrefixedProcess(
+                            e.Action("a"),
+                            e.PrefixedProcess(
+                                e.Action("b", e.Action.DUAL_FORM),
+                                e.NamedProcess("One")
+                            )
+                        ),
+                        [(e.Action(x), e.Action(y))]
+                    ),
+                    e.HidingProcess(
+                        e.PrefixedProcess(
+                            e.Action("a", e.Action.DUAL_FORM),
+                            e.PrefixedProcess(
+                                e.Action("b"),
+                                e.RenamingProcess(
+                                    e.NamedProcess("Two"),
+                                    [(e.Action("x"), e.Action("y"))]
+                                )
+                            )
+                        ),
+                        "L"
+                    )
+                ]),
+                # Still not done, second half is still missing.
+                # Hiding, Renaming, Parallel, Alternative.
+            ])
+        )
         act = g.parse(inp) 
         print(act)
         self.assertEqual(exp, act)
