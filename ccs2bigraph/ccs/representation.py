@@ -15,8 +15,6 @@ This file provides classes for the individual parts of CCS terms, i.e.
 import logging
 logger = logging.getLogger(__name__)
 
-import types
-
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -49,9 +47,16 @@ class ActionSet(object):
         return "{" + ", ".join(map(str, self.actions)) + "}"
     
 @dataclass(frozen=True)
-class NamedActionSet(object):
+class ActionSetByName(object):
+    name: str
+
+@dataclass(frozen=True)
+class ActionSetAssignment(object):
     name: str
     actionSet: ActionSet
+
+    def __str__(self) -> str:
+        return f"{self.name} = {self.actionSet};"
 
 class Process(object):
     pass
@@ -62,7 +67,7 @@ class NilProcess(Process):
         return "0"
     
 @dataclass(frozen=True)
-class NamedProcess(Process):
+class ProcessByName(Process):
     name: str
     
     def __str__(self):
@@ -79,7 +84,7 @@ class PrefixedProcess(Process):
 @dataclass(frozen=True)
 class HidingProcess(Process):
     process: Process
-    hiding: ActionSet | str
+    hiding: ActionSet | ActionSetByName
     
     def __str__(self) -> str:
         return f"({self.process} \\ {self.hiding})"
@@ -108,8 +113,13 @@ class ParallelProcesses(Process):
     
 @dataclass(frozen=True)
 class ProcessAssignment:
-    name: NamedProcess
+    name: str
     process: Process
 
     def __str__(self) -> str:
         return f"{self.name} = {self.process};"
+    
+@dataclass(frozen=True)
+class Ccs:
+    processes: list[ProcessAssignment]
+    sets: list[ActionSetAssignment]
