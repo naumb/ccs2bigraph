@@ -4,46 +4,40 @@ import unittest
 import pyparsing as pp
 
 import ccs2bigraph.ccs.grammar as g
-import ccs2bigraph.ccs.evaluation as e
+import ccs2bigraph.ccs.representation as r
 
 class Action_Test(unittest.TestCase):
     def test_simple_action(self):
         inp = 'a'
-
-        exp = e.Action('a')
-        print(f"Expected: {str(exp)}")
-
+        exp = r.Action('a')
         act = g._action.parse_string(inp)[0] # type: ignore (testing private member)
-        print(f"Actual: {str(act)}")
-
         self.assertEqual(act, exp, f"{act} != {exp}")
 
 
     def test_dual_action(self):
         inp = "'a"
-        exp = e.Action('a', e.Action.DUAL_FORM)
+        exp = r.Action('a', r.Action.DUAL_FORM)
         act = g._action.parse_string(inp)[0] # type: ignore (testing private member)
-        
         self.assertEqual(act, exp, f"{act} != {exp}")
 
 
     def test_long_action(self):
         inp = 'areallylongactionname'
-        exp = e.Action('areallylongactionname')
+        exp = r.Action('areallylongactionname')
         act = g._action.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
 
     def test_action_with_whitespace(self):
         inp = '  a  '
-        exp = e.Action('a')
+        exp = r.Action('a')
         act = g._action.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
 
     def test_action_with_uppercase(self):
         inp = 'aBcDe'
-        exp = e.Action('aBcDe')
+        exp = r.Action('aBcDe')
         act = g._action.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
@@ -57,19 +51,19 @@ class Action_Test(unittest.TestCase):
 class Set_Test(unittest.TestCase):
     def test_simple_set(self):
         inp = "{a}"
-        exp = e.ActionSet([e.Action("a")])
+        exp = r.ActionSet([r.Action("a")])
         act = g._actionset.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_long_set(self):
         inp = "{a, b, c, d}"
-        exp = e.ActionSet(list(map(e.Action, ["a", "b", "c", "d"])))
+        exp = r.ActionSet(list(map(r.Action, ["a", "b", "c", "d"])))
         act = g._actionset.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_named_set(self):
         inp = "set Test = {a, b, c, d};"
-        exp = e.NamedActionSet("Test", e.ActionSet(list(map(e.Action, ["a", "b", "c", "d"]))))
+        exp = r.NamedActionSet("Test", r.ActionSet(list(map(r.Action, ["a", "b", "c", "d"]))))
         act = g._actionset_assignment.parse_string(inp)[0] # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
@@ -77,63 +71,63 @@ class Set_Test(unittest.TestCase):
 class Simple_Grammar_Test(unittest.TestCase):
     def test_simple_process(self):
         inp = "A = 0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.NilProcess())
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.NilProcess())
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_simple_prefixed_process(self):
         inp = "A = a.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.PrefixedProcess(e.Action("a"), e.NilProcess()))
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.PrefixedProcess(r.Action("a"), r.NilProcess()))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_dual_prefixed_process(self):
         inp = "A = 'a.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.NilProcess()))
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.NilProcess()))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_simple_alternative_process(self):
         inp = "A = a.0 + b.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.AlternativeProcesses([
-            e.PrefixedProcess(e.Action("a"), e.NilProcess()),
-            e.PrefixedProcess(e.Action("b"), e.NilProcess())
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.AlternativeProcesses([
+            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
+            r.PrefixedProcess(r.Action("b"), r.NilProcess())
         ]))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_dual_alternative_process(self):
         inp = "A = a.0 + 'b.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.AlternativeProcesses([
-            e.PrefixedProcess(e.Action("a"), e.NilProcess()),
-            e.PrefixedProcess(e.Action("b", e.Action.DUAL_FORM), e.NilProcess())
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.AlternativeProcesses([
+            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
+            r.PrefixedProcess(r.Action("b", r.Action.DUAL_FORM), r.NilProcess())
         ]))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_simple_parallel_process(self):
         inp = "A = a.0 | b.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.ParallelProcesses([
-            e.PrefixedProcess(e.Action("a"), e.NilProcess()),
-            e.PrefixedProcess(e.Action("b"), e.NilProcess())
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.ParallelProcesses([
+            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
+            r.PrefixedProcess(r.Action("b"), r.NilProcess())
         ]))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_dual_parallel_process(self):
         inp = "A = 'a.0 | b.0;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.ParallelProcesses([
-            e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.NilProcess()),
-            e.PrefixedProcess(e.Action("b"), e.NilProcess())
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.ParallelProcesses([
+            r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.NilProcess()),
+            r.PrefixedProcess(r.Action("b"), r.NilProcess())
         ]))
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_simple_hiding_process(self):
         inp = r"A = a.0 \ {a, b};"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.PrefixedProcess(e.Action("a"), e.HidingProcess(e.NilProcess(),
-            e.ActionSet([
-                e.Action("a"), e.Action("b") 
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.PrefixedProcess(r.Action("a"), r.HidingProcess(r.NilProcess(),
+            r.ActionSet([
+                r.Action("a"), r.Action("b") 
             ])
         )))
         act = g.parse(inp)
@@ -141,10 +135,10 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_dual_hiding_process(self):
         inp = r"A = ('a.0) \ {a, b};"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.HidingProcess(
-            e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.NilProcess()),
-            e.ActionSet([
-                e.Action("a"), e.Action("b") 
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.HidingProcess(
+            r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.NilProcess()),
+            r.ActionSet([
+                r.Action("a"), r.Action("b") 
             ])
         ))
         act = g.parse(inp)
@@ -152,8 +146,8 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_ref_hiding_process(self):
         inp = r"A = ('a.0) \ H;"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.HidingProcess(
-            e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.NilProcess()),
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.HidingProcess(
+            r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.NilProcess()),
             "H"
         ))
         act = g.parse(inp)
@@ -161,10 +155,10 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_simple_renaming_process(self):
         inp = r"A = a.0[b/a];"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), 
-            e.PrefixedProcess(
-                e.Action("a"), e.RenamingProcess(e.NilProcess(),
-                    [(e.Action("b"), e.Action("a"))])
+        exp = r.ProcessAssignment(r.NamedProcess("A"), 
+            r.PrefixedProcess(
+                r.Action("a"), r.RenamingProcess(r.NilProcess(),
+                    [(r.Action("b"), r.Action("a"))])
             )
         )
         act = g.parse(inp)
@@ -172,12 +166,12 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_long_renaming_process(self):
         inp = r"A = (a.0)[b/a, d/c, f/e];"
-        exp = e.ProcessAssignment(e.NamedProcess("A"), e.RenamingProcess(
-            e.PrefixedProcess(e.Action("a"), e.NilProcess()),
+        exp = r.ProcessAssignment(r.NamedProcess("A"), r.RenamingProcess(
+            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
             [
-                (e.Action("b"), e.Action("a")),
-                (e.Action("d"), e.Action("c")),
-                (e.Action("f"), e.Action("e")),
+                (r.Action("b"), r.Action("a")),
+                (r.Action("d"), r.Action("c")),
+                (r.Action("f"), r.Action("e")),
             ]
         ))
         act = g.parse(inp)
@@ -187,11 +181,11 @@ class Simple_Grammar_Test(unittest.TestCase):
 class Complex_Grammar_Test(unittest.TestCase):
     def test_multi_prefix_alternative_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two;"
-        exp = e.ProcessAssignment(
-            e.NamedProcess("Testcase"), 
-            e.AlternativeProcesses([
-                e.PrefixedProcess(e.Action("a"), e.PrefixedProcess(e.Action("b", e.Action.DUAL_FORM), e.NamedProcess("One"))),
-                e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.PrefixedProcess(e.Action("b"), e.NamedProcess("Two")))
+        exp = r.ProcessAssignment(
+            r.NamedProcess("Testcase"), 
+            r.AlternativeProcesses([
+                r.PrefixedProcess(r.Action("a"), r.PrefixedProcess(r.Action("b", r.Action.DUAL_FORM), r.NamedProcess("One"))),
+                r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.PrefixedProcess(r.Action("b"), r.NamedProcess("Two")))
             ])
         )
         act = g.parse(inp)
@@ -199,13 +193,13 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_multi_alternatives_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two + a.b.Three + 'a.'b.Four;"
-        exp = e.ProcessAssignment(
-            e.NamedProcess("Testcase"), 
-            e.AlternativeProcesses([
-                e.PrefixedProcess(e.Action("a"), e.PrefixedProcess(e.Action("b", e.Action.DUAL_FORM), e.NamedProcess("One"))),
-                e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.PrefixedProcess(e.Action("b"), e.NamedProcess("Two"))),
-                e.PrefixedProcess(e.Action("a"), e.PrefixedProcess(e.Action("b"), e.NamedProcess("Three"))),
-                e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), e.PrefixedProcess(e.Action("b", e.Action.DUAL_FORM), e.NamedProcess("Four"))),
+        exp = r.ProcessAssignment(
+            r.NamedProcess("Testcase"), 
+            r.AlternativeProcesses([
+                r.PrefixedProcess(r.Action("a"), r.PrefixedProcess(r.Action("b", r.Action.DUAL_FORM), r.NamedProcess("One"))),
+                r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.PrefixedProcess(r.Action("b"), r.NamedProcess("Two"))),
+                r.PrefixedProcess(r.Action("a"), r.PrefixedProcess(r.Action("b"), r.NamedProcess("Three"))),
+                r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), r.PrefixedProcess(r.Action("b", r.Action.DUAL_FORM), r.NamedProcess("Four"))),
             ])
         )
         act = g.parse(inp)
@@ -213,59 +207,206 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_alternatives_renaming_process(self):
         inp = "Testcase = (a.'b.One)[x/y] + 'a.b.Two[x/y];"
-        exp = e.ProcessAssignment(
-            e.NamedProcess("Testcase"), 
-            e.AlternativeProcesses([
-                e.RenamingProcess(
-                    e.PrefixedProcess(e.Action("a"), 
-                        e.PrefixedProcess(e.Action("b", e.Action.DUAL_FORM), 
-                            e.NamedProcess("One"))),
-                    [(e.Action("x"), e.Action("y"))]),
-                e.PrefixedProcess(e.Action("a", e.Action.DUAL_FORM), 
-                    e.PrefixedProcess(e.Action("b"), 
-                        e.RenamingProcess(e.NamedProcess("Two"), 
-                        [(e.Action("x"), e.Action("y"))])))
+        exp = r.ProcessAssignment(
+            r.NamedProcess("Testcase"), 
+            r.AlternativeProcesses([
+                r.RenamingProcess(
+                    r.PrefixedProcess(r.Action("a"), 
+                        r.PrefixedProcess(r.Action("b", r.Action.DUAL_FORM), 
+                            r.NamedProcess("One"))),
+                    [(r.Action("x"), r.Action("y"))]),
+                r.PrefixedProcess(r.Action("a", r.Action.DUAL_FORM), 
+                    r.PrefixedProcess(r.Action("b"), 
+                        r.RenamingProcess(r.NamedProcess("Two"), 
+                        [(r.Action("x"), r.Action("y"))])))
             ]))
         act = g.parse(inp) 
-        print(act)
         self.assertEqual(exp, act)
 
-    def test_complex_process(self):
-        inp = "Testcase = (a.'b.One)[x/y] + ('a.(b.Two[x/y])) \ L | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \ {a, b, c};"
-        exp = e.ProcessAssignment(
-            e.NamedProcess("Testcase"),
-            e.ParallelProcesses([
-                e.AlternativeProcesses([
-                    e.RenamingProcess(
-                        e.PrefixedProcess(
-                            e.Action("a"),
-                            e.PrefixedProcess(
-                                e.Action("b", e.Action.DUAL_FORM),
-                                e.NamedProcess("One")
+    def test_complex_processA(self):
+        inp = "TestcaseComplex1 = A[x/y] + B[x/y];";
+        exp = r.ProcessAssignment(
+            r.NamedProcess("TestcaseComplex1"),
+            r.AlternativeProcesses([
+                r.RenamingProcess(
+                    r.NamedProcess("A"),
+                    [(r.Action("x"), r.Action("y"))]
+                ),
+                r.RenamingProcess(
+                    r.NamedProcess("B"),
+                    [(r.Action("x"), r.Action("y"))]
+                ),
+            ]),
+        )
+
+        act = g.parse(inp) 
+        self.assertEqual(exp, act)
+
+    def test_complex_processB(self):
+        inp = "TestcaseComplex1 = A[x/y] + B[x/y] \\ L;";
+        exp = r.ProcessAssignment(
+            r.NamedProcess("TestcaseComplex1"),
+            r.AlternativeProcesses([
+                r.RenamingProcess(
+                    r.NamedProcess("A"),
+                    [(r.Action("x"), r.Action("y"))]
+                ),
+                r.HidingProcess(
+                    r.RenamingProcess(
+                        r.NamedProcess("B"),
+                        [(r.Action("x"), r.Action("y"))]
+                    ),
+                    "L"
+                )
+            ]),
+        )
+
+        act = g.parse(inp) 
+        self.assertEqual(exp, act)
+
+    def test_complex_processC(self):
+        inp = "TestcaseComplex1 = (A)[x/y] + (B[x/y]) \\ L | 0;";
+        exp = r.ProcessAssignment(
+            r.NamedProcess("TestcaseComplex1"),
+            r.AlternativeProcesses([
+                r.RenamingProcess(
+                    r.NamedProcess("A"),
+                    [(r.Action("x"), r.Action("y"))]
+                ),
+                r.ParallelProcesses([
+                    r.HidingProcess(
+                        r.RenamingProcess(
+                            r.NamedProcess("B"),
+                            [(r.Action("x"), r.Action("y"))]
+                        ),
+                        "L"
+                    ),
+                    r.NilProcess()
+                ]),
+            ])
+        )
+
+        act = g.parse(inp) 
+        self.assertEqual(exp, act)
+
+    def test_complex_processD(self):
+        inp = "Testcase = (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
+        exp = r.ProcessAssignment(
+            r.NamedProcess("Testcase"),
+            r.HidingProcess(
+                r.RenamingProcess(
+                    r.AlternativeProcesses([
+                        r.PrefixedProcess(
+                            r.Action("x"),
+                            r.PrefixedProcess(
+                                r.Action("y"),
+                                r.PrefixedProcess(
+                                    r.Action("z"),
+                                    r.NamedProcess("Test")
+                                )
                             )
                         ),
-                        [(e.Action(x), e.Action(y))]
+                        r.ParallelProcesses([
+                            r.PrefixedProcess(
+                                r.Action("a", r.Action.DUAL_FORM),
+                                r.PrefixedProcess(
+                                    r.Action("b", r.Action.DUAL_FORM),
+                                    r.NilProcess()
+                                )
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("a"),
+                                r.PrefixedProcess(
+                                    r.Action("b"),
+                                    r.NamedProcess("A")
+                                )
+                            )
+                        ]),
+                    ]),
+                    [
+                        (r.Action("a"), r.Action("b")),
+                        (r.Action("b"), r.Action("a")),
+                        (r.Action("x"), r.Action("x")),
+                    ]
+                ),
+                r.ActionSet(list(map(r.Action, ["a", "b", "c"])))
+            )
+        )
+        act = g.parse(inp) 
+        self.assertEqual(exp, act)
+    
+    # @unittest.skip("too slow.")
+    def test_complex_processE(self):
+        inp = "Testcase = ((a.'b.One)[x/y] + ('a.(b.Two[x/y])) \\ L) | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
+        exp = r.ProcessAssignment(
+            r.NamedProcess("Testcase"),
+            r.ParallelProcesses([
+                r.AlternativeProcesses([
+                    r.RenamingProcess(
+                        r.PrefixedProcess(
+                            r.Action("a"),
+                            r.PrefixedProcess(
+                                r.Action("b", r.Action.DUAL_FORM),
+                                r.NamedProcess("One")
+                            )
+                        ),
+                        [(r.Action("x"), r.Action("y"))]
                     ),
-                    e.HidingProcess(
-                        e.PrefixedProcess(
-                            e.Action("a", e.Action.DUAL_FORM),
-                            e.PrefixedProcess(
-                                e.Action("b"),
-                                e.RenamingProcess(
-                                    e.NamedProcess("Two"),
-                                    [(e.Action("x"), e.Action("y"))]
+                    r.HidingProcess(
+                        r.PrefixedProcess(
+                            r.Action("a", r.Action.DUAL_FORM),
+                            r.PrefixedProcess(
+                                r.Action("b"),
+                                r.RenamingProcess(
+                                    r.NamedProcess("Two"),
+                                    [(r.Action("x"), r.Action("y"))]
                                 )
                             )
                         ),
                         "L"
                     )
                 ]),
-                # Still not done, second half is still missing.
-                # Hiding, Renaming, Parallel, Alternative.
+                r.HidingProcess(
+                    r.RenamingProcess(
+                        r.AlternativeProcesses([
+                            r.PrefixedProcess(
+                                r.Action("x"),
+                                r.PrefixedProcess(
+                                    r.Action("y"),
+                                    r.PrefixedProcess(
+                                        r.Action("z"),
+                                        r.NamedProcess("Test")
+                                    )
+                                )
+                            ),
+                            r.ParallelProcesses([   
+                                r.PrefixedProcess(
+                                    r.Action("a", r.Action.DUAL_FORM),
+                                    r.PrefixedProcess(
+                                        r.Action("b", r.Action.DUAL_FORM),
+                                        r.NilProcess()
+                                    )
+                                ),
+                                r.PrefixedProcess(
+                                    r.Action("a"),
+                                    r.PrefixedProcess(
+                                        r.Action("b"),
+                                        r.NamedProcess("A")
+                                    )
+                                )
+                            ])
+                        ]),
+                        [
+                            (r.Action("a"), r.Action("b")),
+                            (r.Action("b"), r.Action("a")),
+                            (r.Action("x"), r.Action("x")),
+                        ]
+                    ),
+                    r.ActionSet(list(map(r.Action, ["a", "b", "c"])))
+                )
             ])
         )
         act = g.parse(inp) 
-        print(act)
         self.assertEqual(exp, act)
 
 if __name__ == '__main__':

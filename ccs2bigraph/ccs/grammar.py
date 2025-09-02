@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 import pyparsing as pp
 
-from .evaluation import Action, ActionSet, AlternativeProcesses, HidingProcess, NamedActionSet, NamedProcess, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess
+from .representation import Action, ActionSet, AlternativeProcesses, HidingProcess, NamedActionSet, NamedProcess, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess
 
 # Comments
 _comment = pp.Literal("*") + pp.restOfLine

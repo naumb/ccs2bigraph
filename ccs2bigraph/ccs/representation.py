@@ -1,5 +1,5 @@
 """
-Evaluation of CCS Terms
+Representation of CCS Terms
 
 This file provides classes for the individual parts of CCS terms, i.e.
 - actions
@@ -19,6 +19,7 @@ import types
 
 from dataclasses import dataclass
 
+@dataclass(frozen=True)
 class Action(object):
     """
     Represents Actions of CCS Terms
@@ -31,55 +32,26 @@ class Action(object):
     NORMAL_FORM = False
     DUAL_FORM = True
 
-    def __init__(self, name: str, is_dual: bool = NORMAL_FORM):
-        self.name = name
-        self.is_dual = is_dual
+    name: str
+    is_dual: bool = NORMAL_FORM
 
     def get_dual_action(self):
         return Action(self.name, not self.is_dual)
-    
-    def __repr__(self) -> str:
-        return f"Action(name={self.name}, is_dual={self.is_dual})"
 
     def __str__(self) -> str:
         return ("'" if self.is_dual else "") + f"{self.name}"
-    
-    def __eq__(self, other: object) -> bool | types.NotImplementedType:
-        if not isinstance(other, Action):
-            return NotImplemented
-            
-        return self.name == other.name and self.is_dual == other.is_dual
-    
-class ActionSet(object):
-    def __init__(self, actions: list[Action]):
-        self.actions = actions
 
-    def __eq__(self, other: object) -> bool | types.NotImplementedType:
-        if not isinstance(other, ActionSet):
-            return NotImplemented
-            
-        return all([
-            (a == b) 
-            for a, b 
-            in zip(self.actions, other.actions, strict=True)]
-        )
-    
-    def __repr__(self) -> str:
-        return f"ActionSet(actions={self.actions})"
+@dataclass(frozen=True)
+class ActionSet(object):
+    actions: list[Action]
 
     def __str__(self) -> str:
         return "{" + ", ".join(map(str, self.actions)) + "}"
     
+@dataclass(frozen=True)
 class NamedActionSet(object):
-    def __init__(self, name: str, actionSet: ActionSet):
-        self.name = name
-        self.actionSet = actionSet
-
-    def __eq__(self, other: object) -> bool | types.NotImplementedType:
-        if not isinstance(other, NamedActionSet):
-            return NotImplemented
-            
-        return self.name == other.name and self.actionSet == other.actionSet
+    name: str
+    actionSet: ActionSet
 
 class Process(object):
     pass
