@@ -2,6 +2,7 @@
 
 import unittest
 import pyparsing as pp
+import pathlib
 
 import ccs2bigraph.ccs.grammar as g
 import ccs2bigraph.ccs.representation as r
@@ -65,6 +66,48 @@ class Set_Test(unittest.TestCase):
         )
         act = g._actionset_assignment.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
+
+    def test_weirdly_named_actionset_exlam(self):
+        inp = r"set A! = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A!", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_hashpipe(self):
+        inp = r"set A# = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A#", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_prime(self):
+        inp = r"set A' = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A'", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_dash(self):
+        inp = r"set A- = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A-", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_qm(self):
+        inp = r"set A? = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A?", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_circumflex(self):
+        inp = r"set A^ = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A^", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_actionset_underscore(self):
+        inp = r"set A_ = {a};"
+        exp = r.Ccs([], [r.ActionSetAssignment("A_", r.ActionSet([r.Action("a")]))])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
 
 
 class Simple_Grammar_Test(unittest.TestCase):
@@ -277,6 +320,48 @@ class Simple_Grammar_Test(unittest.TestCase):
             ],
             [],
         )
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+
+    def test_weirdly_named_process_exlam(self):
+        inp = r"A! = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A!", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_hashpipe(self):
+        inp = r"A# = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A#", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_prime(self):
+        inp = r"A' = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A'", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_dash(self):
+        inp = r"A- = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A-", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_qm(self):
+        inp = r"A? = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A?", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_circumflex(self):
+        inp = r"A^ = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A^", r.NilProcess())], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+    
+    def test_weirdly_named_process_underscore(self):
+        inp = r"A_ = 0;"
+        exp = r.Ccs([r.ProcessAssignment("A_", r.NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
@@ -624,6 +709,450 @@ class Complex_Grammar_Test(unittest.TestCase):
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
+class Ccs_Input_Grammar_Test(unittest.TestCase):
+    def test_simple_ccs(self):
+        inp = """
+            A = a.0;
+            B = b.0;
+            set C = {a, b, c};
+        """
+        exp = r.Ccs(
+            [
+                r.ProcessAssignment("A", r.PrefixedProcess(r.Action("a"), r.NilProcess())),
+                r.ProcessAssignment("B", r.PrefixedProcess(r.Action("b"), r.NilProcess())),
+            ],
+            [
+                r.ActionSetAssignment("C", r.ActionSet(list(map(r.Action, ["a", "b", "c"]))))
+            ],
+        )
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+
+    def test_basic_buffer(self):
+        inputdir = pathlib.Path(__file__).parent
+
+        with open(inputdir / "res" / "basic_buffer.ccs") as f:
+            inp = f.read()
+
+        exp = r.Ccs([
+            r.ProcessAssignment(
+                "Buff3", 
+                r.HidingProcess(
+                    r.ParallelProcesses(
+                        list(map(r.ProcessByName, ["C0", "C1", "C2"]))
+                    ),
+                    r.ActionSet(
+                        list(map(r.Action, ["c", "d"]))
+                    )
+                )
+            ),
+            r.ProcessAssignment(
+                "C0",
+                r.RenamingProcess(
+                    r.ProcessByName("Cell"),
+                    [
+                        (r.Action("c"), r.Action("b")),
+                    ]
+                )
+            ),
+            r.ProcessAssignment(
+                "C1",
+                r.RenamingProcess(
+                    r.ProcessByName("Cell"),
+                    [
+                        (r.Action("c"), r.Action("a")),
+                        (r.Action("d"), r.Action("b")),
+                    ]
+                )
+            ),
+            r.ProcessAssignment(
+                "C2",
+                r.RenamingProcess(
+                    r.ProcessByName("Cell"),
+                    [
+                        (r.Action("d"), r.Action("a")),
+                    ]
+                )
+            ),
+            r.ProcessAssignment(
+                "Cell",
+                r.PrefixedProcess(
+                    r.Action("a"),
+                    r.PrefixedProcess(
+                        r.Action("b", r.Action.DUAL_FORM),
+                        r.ProcessByName("Cell")
+                    )
+                )
+            ),
+            r.ProcessAssignment(
+                "Spec",
+                r.PrefixedProcess(
+                    r.Action("a"),
+                    r.ProcessByName("Spec'")
+                )
+            ),
+            r.ProcessAssignment(
+                "Spec'",
+                r.AlternativeProcesses(
+                    [
+                        r.PrefixedProcess(
+                            r.Action("b", r.Action.DUAL_FORM),
+                            r.ProcessByName("Spec")
+                        ),
+                        r.PrefixedProcess(
+                            r.Action("a"),
+                            r.ProcessByName("Spec''")
+                        )
+                    ]
+                )
+            ),
+            r.ProcessAssignment(
+                "Spec''",
+                r.AlternativeProcesses(
+                    [
+                        r.PrefixedProcess(
+                            r.Action("b", r.Action.DUAL_FORM),
+                            r.ProcessByName("Spec'")
+                        ),
+                        r.PrefixedProcess(
+                            r.Action("a"),
+                            r.PrefixedProcess(
+                                r.Action("b", r.Action.DUAL_FORM),
+                                r.ProcessByName("Spec''")
+                            )
+                        )
+                    ]
+                )
+            ),
+        ], [])
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
+
+    def test_dekker(self):
+        inputdir = pathlib.Path(__file__).parent
+
+        with open(inputdir / "res" / "dekker.ccs") as f:
+            inp = f.read()
+
+        exp = r.Ccs(
+            [
+                r.ProcessAssignment(
+                    "B1f",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b1rf", r.Action.DUAL_FORM),
+                                r.ProcessByName("B1f"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b1wf"),
+                                r.ProcessByName("B1f"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b1wt"),
+                                r.ProcessByName("B1t"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "B1t",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b1rt", r.Action.DUAL_FORM),
+                                r.ProcessByName("B1t"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b1wt"),
+                                r.ProcessByName("B1t"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b1wf"),
+                                r.ProcessByName("B1f"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "B2f",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b2rf", r.Action.DUAL_FORM),
+                                r.ProcessByName("B2f"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b2wf"),
+                                r.ProcessByName("B2f"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b2wt"),
+                                r.ProcessByName("B2t"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "B2t",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b2rt", r.Action.DUAL_FORM),
+                                r.ProcessByName("B2t"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b2wt"),
+                                r.ProcessByName("B2t"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b2wf"),
+                                r.ProcessByName("B2f"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "K1",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr1", r.Action.DUAL_FORM),
+                                r.ProcessByName("K1"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kw1"),
+                                r.ProcessByName("K1"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kw2"),
+                                r.ProcessByName("K2"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "K2",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr2", r.Action.DUAL_FORM),
+                                r.ProcessByName("K2"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kw2"),
+                                r.ProcessByName("K2"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kw1"),
+                                r.ProcessByName("K1"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P1",
+                    r.PrefixedProcess(
+                        r.Action("b1wt", r.Action.DUAL_FORM),
+                        r.ProcessByName("P11"),
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P11",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b2rf"),
+                                r.ProcessByName("P14"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b2rt"),
+                                r.ProcessByName("P12"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P12",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr1"),
+                                r.ProcessByName("P11"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kr2"),
+                                r.PrefixedProcess(
+                                    r.Action("b1wf", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P13"),
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P13",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr2"),
+                                r.ProcessByName("P13"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kr1"),
+                                r.PrefixedProcess(
+                                    r.Action("b1wt", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P11"),
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P14",
+                    r.PrefixedProcess(
+                        r.Action("enter"),
+                        r.PrefixedProcess(
+                            r.Action("exit"),
+                            r.PrefixedProcess(
+                                r.Action("kw2", r.Action.DUAL_FORM),
+                                r.PrefixedProcess(
+                                    r.Action("b1wf", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P1"),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P2",
+                    r.PrefixedProcess(
+                        r.Action("b2wt", r.Action.DUAL_FORM),
+                        r.ProcessByName("P21"),
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P21",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("b1rf"),
+                                r.ProcessByName("P24"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("b1rt"),
+                                r.ProcessByName("P22"),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P22",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr2"),
+                                r.ProcessByName("P21"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kr1"),
+                                r.PrefixedProcess(
+                                    r.Action("b2wf", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P23"),
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P23",
+                    r.AlternativeProcesses(
+                        [
+                            r.PrefixedProcess(
+                                r.Action("kr1"),
+                                r.ProcessByName("P23"),
+                            ),
+                            r.PrefixedProcess(
+                                r.Action("kr2"),
+                                r.PrefixedProcess(
+                                    r.Action("b2wt", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P21"),
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "P24",
+                    r.PrefixedProcess(
+                        r.Action("enter"),
+                        r.PrefixedProcess(
+                            r.Action("exit"),
+                            r.PrefixedProcess(
+                                r.Action("kw1", r.Action.DUAL_FORM),
+                                r.PrefixedProcess(
+                                    r.Action("b2wf", r.Action.DUAL_FORM),
+                                    r.ProcessByName("P2"),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "Pre-Dekker-2",
+                    r.ParallelProcesses(
+                        list(map(r.ProcessByName, [
+                            "P1",
+                            "P2",
+                            "K1",
+                            "B1f",
+                            "B2f",
+                        ]))
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "Dekker-2",
+                    r.HidingProcess(
+                        r.ProcessByName("Pre-Dekker-2"),
+                        r.ActionSetByName("L"),
+                    ),
+                ),
+                r.ProcessAssignment(
+                    "Spec",
+                    r.PrefixedProcess(
+                        r.Action("enter"),
+                        r.PrefixedProcess(
+                            r.Action("exit"),
+                            r.ProcessByName("Spec"),
+                        ),
+                    ),
+                ),
+            ],
+            [
+                r.ActionSetAssignment(
+                    "L",
+                    r.ActionSet(
+                        list(map(r.Action, [
+                            "b1rf",
+                            "b1rt",
+                            "b1wf",
+                            "b1wt",
+                            "b2rf",
+                            "b2rt",
+                            "b2wf",
+                            "b2wt",
+                            "kr1",
+                            "kr2",
+                            "kw1",
+                            "kw2",
+                        ]))
+                    ),
+                )
+            ],
+        )
+
+        act = g.parse(inp)
+        self.assertEqual(exp, act)
 
 if __name__ == "__main__":
     unittest.main()

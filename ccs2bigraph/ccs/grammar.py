@@ -16,7 +16,9 @@ Operations:
 - parallel composition, e.g. "a.0 | B | 0"
 - alternative composition, e.g. "a.0 + B + 0"
 
-We implement these rules as an infix grammar, where processes 
+We implement these rules as an infix grammar.
+
+Furthermore, Actions and Action-Sets as well as corresponding assignments are implemented.
 """
 
 import logging
@@ -56,7 +58,7 @@ def _actionset_parse_action(pr: pp.ParseResults) -> ActionSet:
 
 _actionset.setParseAction(_actionset_parse_action)
 
-_actionset_name = pp.Word(pp.alphas.upper(), pp.alphanums)
+_actionset_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 
 def _actionset_name_parse_action(pr: pp.ParseResults) -> ActionSetByName:
     return ActionSetByName(tp.cast(str, pr[0]))
@@ -64,7 +66,7 @@ def _actionset_name_parse_action(pr: pp.ParseResults) -> ActionSetByName:
 _actionset_name.set_parse_action(_actionset_name_parse_action)
 
 _actionset_assignment_keyword = pp.Suppress("set")
-_actionset_assignment_name = pp.Word(pp.alphas.upper(), pp.alphanums)
+_actionset_assignment_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 _actionset_assignment_operator = pp.Suppress("=")
 _actionset_assignment_finalizer = pp.Suppress(";")
 _actionset_assignment = _actionset_assignment_keyword + _actionset_assignment_name + _actionset_assignment_operator + _actionset + _actionset_assignment_finalizer
@@ -76,7 +78,7 @@ _actionset_assignment.setParseAction(_actionset_assignment_parse_action)
 
 # processes
 # we do need a notion of processes already, however they aren't (fully) defined yet.
-_process_name = pp.Word(pp.alphas.upper(), pp.alphanums)
+_process_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 
 def _process_name_parse_action(pr: pp.ParseResults) -> ProcessByName:
     return ProcessByName(tp.cast(str, pr[0]))
@@ -143,7 +145,7 @@ _process = pp.infix_notation(
     ]
 )
 
-_process_assignment_name = pp.Word(pp.alphas.upper(), pp.alphanums)
+_process_assignment_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 _process_assignment_operator = pp.Suppress('=')
 _process_assignment_finalizer = pp.Suppress(';')
 _process_assignment = _process_assignment_name + _process_assignment_operator + _process + _process_assignment_finalizer
@@ -171,6 +173,6 @@ _ccs.set_parse_action(_ccs_parse_action)
 
 def parse(raw: str) -> Ccs:
     logger.info(f"Trying to parse {raw}")
-    res = tp.cast(Ccs, _ccs.parse_string(raw)[0])
+    res = tp.cast(Ccs, _ccs.parse_string(raw, True)[0])
     logger.info(f"Done parsing {raw}")
     return res

@@ -122,4 +122,4 @@ class ProcessAssignment:
 @dataclass(frozen=True)
 class Ccs:
     processes: list[ProcessAssignment]
-    sets: list[ActionSetAssignment]
+    action_sets: list[ActionSetAssignment]

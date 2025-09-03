@@ -1,0 +1,12 @@
+* This is a basic buffer example in CWB syntax taken form
+* http://homepages.inf.ed.ac.uk/perdita/cwb/Examples/ccs/ (basic.cwb)
+
+Buff3 = (C0 | C1 | C2)\{c,d}; 
+C0 = Cell[c/b]; 
+C1 = Cell[c/a,d/b]; 
+C2 = Cell[d/a]; 
+Cell = a.'b.Cell; 
+
+Spec = a.Spec'; 
+Spec' = 'b.Spec + a.Spec'';
+Spec'' = 'b.Spec' + a.'b.Spec'';
