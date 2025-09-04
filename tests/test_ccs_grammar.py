@@ -17,7 +17,7 @@ class Action_Test(unittest.TestCase):
 
     def test_dual_action(self):
         inp = "'a"
-        exp = r.Action("a", r.Action.DUAL_FORM)
+        exp = r.DualAction("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
@@ -137,7 +137,7 @@ class Simple_Grammar_Test(unittest.TestCase):
                 r.ProcessAssignment(
                     "A",
                     r.PrefixedProcess(
-                        r.Action("a", r.Action.DUAL_FORM), r.NilProcess()
+                        r.DualAction("a"), r.NilProcess()
                     ),
                 )
             ],
@@ -175,7 +175,7 @@ class Simple_Grammar_Test(unittest.TestCase):
                         [
                             r.PrefixedProcess(r.Action("a"), r.NilProcess()),
                             r.PrefixedProcess(
-                                r.Action("b", r.Action.DUAL_FORM), r.NilProcess()
+                                r.DualAction("b"), r.NilProcess()
                             ),
                         ]
                     ),
@@ -214,7 +214,7 @@ class Simple_Grammar_Test(unittest.TestCase):
                     r.ParallelProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("a", r.Action.DUAL_FORM), r.NilProcess()
+                                r.DualAction("a"), r.NilProcess()
                             ),
                             r.PrefixedProcess(r.Action("b"), r.NilProcess()),
                         ]
@@ -253,7 +253,7 @@ class Simple_Grammar_Test(unittest.TestCase):
                     "A",
                     r.HidingProcess(
                         r.PrefixedProcess(
-                            r.Action("a", r.Action.DUAL_FORM), r.NilProcess()
+                            r.DualAction("a"), r.NilProcess()
                         ),
                         r.ActionSet([r.Action("a"), r.Action("b")]),
                     ),
@@ -272,7 +272,7 @@ class Simple_Grammar_Test(unittest.TestCase):
                     "A",
                     r.HidingProcess(
                         r.PrefixedProcess(
-                            r.Action("a", r.Action.DUAL_FORM), r.NilProcess()
+                            r.DualAction("a"), r.NilProcess()
                         ),
                         r.ActionSetByName("H"),
                     ),
@@ -378,12 +378,12 @@ class Complex_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("a"),
                                 r.PrefixedProcess(
-                                    r.Action("b", r.Action.DUAL_FORM),
+                                    r.DualAction("b"),
                                     r.ProcessByName("One"),
                                 ),
                             ),
                             r.PrefixedProcess(
-                                r.Action("a", r.Action.DUAL_FORM),
+                                r.DualAction("a"),
                                 r.PrefixedProcess(
                                     r.Action("b"), r.ProcessByName("Two")
                                 ),
@@ -408,12 +408,12 @@ class Complex_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("a"),
                                 r.PrefixedProcess(
-                                    r.Action("b", r.Action.DUAL_FORM),
+                                    r.DualAction("b"),
                                     r.ProcessByName("One"),
                                 ),
                             ),
                             r.PrefixedProcess(
-                                r.Action("a", r.Action.DUAL_FORM),
+                                r.DualAction("a"),
                                 r.PrefixedProcess(
                                     r.Action("b"), r.ProcessByName("Two")
                                 ),
@@ -425,9 +425,9 @@ class Complex_Grammar_Test(unittest.TestCase):
                                 ),
                             ),
                             r.PrefixedProcess(
-                                r.Action("a", r.Action.DUAL_FORM),
+                                r.DualAction("a"),
                                 r.PrefixedProcess(
-                                    r.Action("b", r.Action.DUAL_FORM),
+                                    r.DualAction("b"),
                                     r.ProcessByName("Four"),
                                 ),
                             ),
@@ -452,14 +452,14 @@ class Complex_Grammar_Test(unittest.TestCase):
                                 r.PrefixedProcess(
                                     r.Action("a"),
                                     r.PrefixedProcess(
-                                        r.Action("b", r.Action.DUAL_FORM),
+                                        r.DualAction("b"),
                                         r.ProcessByName("One"),
                                     ),
                                 ),
                                 [(r.Action("x"), r.Action("y"))],
                             ),
                             r.PrefixedProcess(
-                                r.Action("a", r.Action.DUAL_FORM),
+                                r.DualAction("a"),
                                 r.PrefixedProcess(
                                     r.Action("b"),
                                     r.RenamingProcess(
@@ -587,9 +587,9 @@ class Complex_Grammar_Test(unittest.TestCase):
                                     r.ParallelProcesses(
                                         [
                                             r.PrefixedProcess(
-                                                r.Action("a", r.Action.DUAL_FORM),
+                                                r.DualAction("a"),
                                                 r.PrefixedProcess(
-                                                    r.Action("b", r.Action.DUAL_FORM),
+                                                    r.DualAction("b"),
                                                     r.NilProcess(),
                                                 ),
                                             ),
@@ -633,7 +633,7 @@ class Complex_Grammar_Test(unittest.TestCase):
                                         r.PrefixedProcess(
                                             r.Action("a"),
                                             r.PrefixedProcess(
-                                                r.Action("b", r.Action.DUAL_FORM),
+                                                r.DualAction("b"),
                                                 r.ProcessByName("One"),
                                             ),
                                         ),
@@ -641,7 +641,7 @@ class Complex_Grammar_Test(unittest.TestCase):
                                     ),
                                     r.HidingProcess(
                                         r.PrefixedProcess(
-                                            r.Action("a", r.Action.DUAL_FORM),
+                                            r.DualAction("a"),
                                             r.PrefixedProcess(
                                                 r.Action("b"),
                                                 r.RenamingProcess(
@@ -671,13 +671,9 @@ class Complex_Grammar_Test(unittest.TestCase):
                                             r.ParallelProcesses(
                                                 [
                                                     r.PrefixedProcess(
-                                                        r.Action(
-                                                            "a", r.Action.DUAL_FORM
-                                                        ),
+                                                        r.DualAction("a"),
                                                         r.PrefixedProcess(
-                                                            r.Action(
-                                                                "b", r.Action.DUAL_FORM
-                                                            ),
+                                                            r.DualAction("b"),
                                                             r.NilProcess(),
                                                         ),
                                                     ),
@@ -779,7 +775,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                 r.PrefixedProcess(
                     r.Action("a"),
                     r.PrefixedProcess(
-                        r.Action("b", r.Action.DUAL_FORM),
+                        r.DualAction("b"),
                         r.ProcessByName("Cell")
                     )
                 )
@@ -796,7 +792,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                 r.AlternativeProcesses(
                     [
                         r.PrefixedProcess(
-                            r.Action("b", r.Action.DUAL_FORM),
+                            r.DualAction("b"),
                             r.ProcessByName("Spec")
                         ),
                         r.PrefixedProcess(
@@ -811,13 +807,13 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                 r.AlternativeProcesses(
                     [
                         r.PrefixedProcess(
-                            r.Action("b", r.Action.DUAL_FORM),
+                            r.DualAction("b"),
                             r.ProcessByName("Spec'")
                         ),
                         r.PrefixedProcess(
                             r.Action("a"),
                             r.PrefixedProcess(
-                                r.Action("b", r.Action.DUAL_FORM),
+                                r.DualAction("b"),
                                 r.ProcessByName("Spec''")
                             )
                         )
@@ -841,7 +837,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("b1rf", r.Action.DUAL_FORM),
+                                r.DualAction("b1rf"),
                                 r.ProcessByName("B1f"),
                             ),
                             r.PrefixedProcess(
@@ -860,7 +856,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("b1rt", r.Action.DUAL_FORM),
+                                r.DualAction("b1rt"),
                                 r.ProcessByName("B1t"),
                             ),
                             r.PrefixedProcess(
@@ -879,7 +875,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("b2rf", r.Action.DUAL_FORM),
+                                r.DualAction("b2rf"),
                                 r.ProcessByName("B2f"),
                             ),
                             r.PrefixedProcess(
@@ -898,7 +894,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("b2rt", r.Action.DUAL_FORM),
+                                r.DualAction("b2rt"),
                                 r.ProcessByName("B2t"),
                             ),
                             r.PrefixedProcess(
@@ -917,7 +913,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("kr1", r.Action.DUAL_FORM),
+                                r.DualAction("kr1"),
                                 r.ProcessByName("K1"),
                             ),
                             r.PrefixedProcess(
@@ -936,7 +932,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                     r.AlternativeProcesses(
                         [
                             r.PrefixedProcess(
-                                r.Action("kr2", r.Action.DUAL_FORM),
+                                r.DualAction("kr2"),
                                 r.ProcessByName("K2"),
                             ),
                             r.PrefixedProcess(
@@ -953,7 +949,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                 r.ProcessAssignment(
                     "P1",
                     r.PrefixedProcess(
-                        r.Action("b1wt", r.Action.DUAL_FORM),
+                        r.DualAction("b1wt"),
                         r.ProcessByName("P11"),
                     ),
                 ),
@@ -983,7 +979,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("kr2"),
                                 r.PrefixedProcess(
-                                    r.Action("b1wf", r.Action.DUAL_FORM),
+                                    r.DualAction("b1wf"),
                                     r.ProcessByName("P13"),
                                 ),
                             ),
@@ -1001,7 +997,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("kr1"),
                                 r.PrefixedProcess(
-                                    r.Action("b1wt", r.Action.DUAL_FORM),
+                                    r.DualAction("b1wt"),
                                     r.ProcessByName("P11"),
                                 ),
                             ),
@@ -1015,9 +1011,9 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                         r.PrefixedProcess(
                             r.Action("exit"),
                             r.PrefixedProcess(
-                                r.Action("kw2", r.Action.DUAL_FORM),
+                                r.DualAction("kw2"),
                                 r.PrefixedProcess(
-                                    r.Action("b1wf", r.Action.DUAL_FORM),
+                                    r.DualAction("b1wf"),
                                     r.ProcessByName("P1"),
                                 ),
                             ),
@@ -1027,7 +1023,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                 r.ProcessAssignment(
                     "P2",
                     r.PrefixedProcess(
-                        r.Action("b2wt", r.Action.DUAL_FORM),
+                        r.DualAction("b2wt"),
                         r.ProcessByName("P21"),
                     ),
                 ),
@@ -1057,7 +1053,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("kr1"),
                                 r.PrefixedProcess(
-                                    r.Action("b2wf", r.Action.DUAL_FORM),
+                                    r.DualAction("b2wf"),
                                     r.ProcessByName("P23"),
                                 ),
                             ),
@@ -1075,7 +1071,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                             r.PrefixedProcess(
                                 r.Action("kr2"),
                                 r.PrefixedProcess(
-                                    r.Action("b2wt", r.Action.DUAL_FORM),
+                                    r.DualAction("b2wt"),
                                     r.ProcessByName("P21"),
                                 ),
                             ),
@@ -1089,9 +1085,9 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                         r.PrefixedProcess(
                             r.Action("exit"),
                             r.PrefixedProcess(
-                                r.Action("kw1", r.Action.DUAL_FORM),
+                                r.DualAction("kw1"),
                                 r.PrefixedProcess(
-                                    r.Action("b2wf", r.Action.DUAL_FORM),
+                                    r.DualAction("b2wf"),
                                     r.ProcessByName("P2"),
                                 ),
                             ),

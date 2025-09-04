@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 import pyparsing as pp
 import typing as tp
 
-from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, Ccs, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
+from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, Ccs, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
 
 # Performance
 pp.ParserElement.enable_packrat()
@@ -37,15 +37,15 @@ _comment = pp.Literal("*") + pp.restOfLine
 
 # atomic elements: Actions
 _raw_action = pp.Word(pp.alphas.lower(), pp.alphanums)
-_dual_action = pp.Suppress("'") + _raw_action
+_dual_action = pp.Suppress("'") + _raw_action.copy()
 
 def _raw_action_parse_action(pr: pp.ParseResults) -> Action:
-    return Action(tp.cast(str, pr[0]), False)
+    return Action(tp.cast(str, pr[0]))
 
 _raw_action.setParseAction(_raw_action_parse_action)
 
-def _dual_action_parse_action(pr: pp.ParseResults) -> Action:
-    return tp.cast(Action, pr[0]).get_dual_action()
+def _dual_action_parse_action(pr: pp.ParseResults) -> DualAction:
+    return DualAction(tp.cast(str, pr[0]))
 
 _dual_action.setParseAction(_dual_action_parse_action)
 

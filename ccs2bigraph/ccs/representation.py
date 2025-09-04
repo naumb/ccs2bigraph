@@ -1,5 +1,5 @@
 """
-Representation of CCS Terms
+Representation of CCS Terms (c.f. CAAL Syntax)
 
 This file provides classes for the individual parts of CCS terms, i.e.
 - actions
@@ -23,22 +23,35 @@ class Action(object):
     """
     Represents Actions of CCS Terms
     
-    Actions consist of
-    - a name (starting with a lowercase character)
-    - a property whether or not they are of the dual kind (i.e. 'a)
+    :param str name: The name of the Action, starting with a lowercase character
+
+    Example
+    >>> str(Action('a'))
+    'a'
     """
 
-    NORMAL_FORM = False
-    DUAL_FORM = True
-
     name: str
-    is_dual: bool = NORMAL_FORM
-
-    def get_dual_action(self):
-        return Action(self.name, not self.is_dual)
 
     def __str__(self) -> str:
-        return ("'" if self.is_dual else "") + f"{self.name}"
+        return f"{self.name}"
+    
+@dataclass(frozen=True)
+class DualAction(Action):
+    """
+    Represents Dual Actions of CCS Terms
+    
+    :param str name: The name of the Action, starting with a lowercase character
+    :param bool is_dual: Whether or not the action is in it's dual form (e.g. 'a)
+
+    :const 
+
+    Example
+    >>> str(DualAction('x'))
+    "'x"
+    """
+
+    def __str__(self) -> str:
+        return f"'{self.name}"
 
 @dataclass(frozen=True)
 class ActionSet(object):
@@ -136,7 +149,7 @@ class PrefixedProcess(Process):
     Example:
     >>> str(PrefixedProcess(Action('a'), NilProcess()))
     '(a.0)'
-    >>> str(PrefixedProcess(Action('a'), PrefixedProcess(Action('b', Action.DUAL_FORM), NilProcess())))
+    >>> str(PrefixedProcess(Action('a'), PrefixedProcess(DualAction('b'), NilProcess())))
     "(a.('b.0))"
     """
     prefix: Action
