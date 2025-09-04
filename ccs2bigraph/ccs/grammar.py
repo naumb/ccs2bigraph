@@ -29,6 +29,9 @@ import typing as tp
 
 from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, Ccs, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
 
+# Performance
+pp.ParserElement.enable_packrat()
+
 # Comments
 _comment = pp.Literal("*") + pp.restOfLine
 
@@ -105,6 +108,7 @@ _inner_renaming = pp.Group(_action + _inner_renaming_operator + _action)
 _inner_renaming_seperator = pp.Suppress(",")
 _renaming_rule = _l_renaming_operator + pp.ZeroOrMore(_inner_renaming + _inner_renaming_seperator) + _inner_renaming + _r_renaming_operator
 
+# define parse actions for individual operators
 def _renaming_parse_action(pr: pp.ParseResults) -> RenamingProcess:
     return RenamingProcess(
         tp.cast(Process, pr[0][0]), 
@@ -133,6 +137,7 @@ def _parallel_parse_action(pr: pp.ParseResults) -> ParallelProcesses:
 def _alternative_parse_action(pr: pp.ParseResults) -> AlternativeProcesses:
     return AlternativeProcesses(tp.cast(list[Process], pr.as_list()[0])) # pyright: ignore[reportUnknownMemberType]
 
+# overall process definition including operators
 _process = pp.infix_notation(
     _process_atom,
     [
@@ -145,6 +150,7 @@ _process = pp.infix_notation(
     ]
 )
 
+# process assignment
 _process_assignment_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 _process_assignment_operator = pp.Suppress('=')
 _process_assignment_finalizer = pp.Suppress(';')
@@ -158,6 +164,7 @@ def _process_assignment_parse_action(pr: pp.ParseResults) -> ProcessAssignment:
 
 _process_assignment.setParseAction(_process_assignment_parse_action)
 
+# overall grammar for multiple process or action set assignments, corresponds to input files.
 _ccs = pp.ZeroOrMore(_process_assignment | _actionset_assignment)
 _ccs.ignore(_comment)
 
@@ -172,6 +179,7 @@ def _ccs_parse_action(pr: pp.ParseResults) -> Ccs:
 _ccs.set_parse_action(_ccs_parse_action)
 
 def parse(raw: str) -> Ccs:
+    """CCS Process file (c.f. CAAL input) parsing"""
     logger.info(f"Trying to parse {raw}")
     res = tp.cast(Ccs, _ccs.parse_string(raw, True)[0])
     logger.info(f"Done parsing {raw}")
