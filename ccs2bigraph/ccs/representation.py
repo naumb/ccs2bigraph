@@ -231,7 +231,7 @@ class ParallelProcesses(Process):
 @dataclass(frozen=True)
 class ProcessAssignment:
     """
-    Assignment of an `Process` to a name.
+    Assignment of a `Process` to a name.
 
     :param str name: The name to which the `Process` is assigned
     :param Process process: The assigned `Process` itself
