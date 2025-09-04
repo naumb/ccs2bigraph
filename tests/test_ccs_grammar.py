@@ -5,37 +5,37 @@ import pyparsing as pp
 import pathlib
 
 import ccs2bigraph.ccs.grammar as g
-import ccs2bigraph.ccs.representation as r
+from ccs2bigraph.ccs.representation import *
 
 
 class Action_Test(unittest.TestCase):
     def test_simple_action(self):
         inp = "a"
-        exp = r.Action("a")
+        exp = Action("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_dual_action(self):
         inp = "'a"
-        exp = r.DualAction("a")
+        exp = DualAction("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_long_action(self):
         inp = "areallylongactionname"
-        exp = r.Action("areallylongactionname")
+        exp = Action("areallylongactionname")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_action_with_whitespace(self):
         inp = "  a  "
-        exp = r.Action("a")
+        exp = Action("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_action_with_uppercase(self):
         inp = "aBcDe"
-        exp = r.Action("aBcDe")
+        exp = Action("aBcDe")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
@@ -49,63 +49,63 @@ class Action_Test(unittest.TestCase):
 class Set_Test(unittest.TestCase):
     def test_simple_set(self):
         inp = "{a}"
-        exp = r.ActionSet([r.Action("a")])
+        exp = ActionSet([Action("a")])
         act = g._actionset.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_long_set(self):
         inp = "{a, b, c, d}"
-        exp = r.ActionSet(list(map(r.Action, ["a", "b", "c", "d"])))
+        exp = ActionSet(list(map(Action, ["a", "b", "c", "d"])))
         act = g._actionset.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_set_assignment(self):
         inp = "set Test = {a, b, c, d};"
-        exp = r.ActionSetAssignment(
-            "Test", r.ActionSet(list(map(r.Action, ["a", "b", "c", "d"])))
+        exp = ActionSetAssignment(
+            "Test", ActionSet(list(map(Action, ["a", "b", "c", "d"])))
         )
         act = g._actionset_assignment.parse_string(inp)[0]  # type: ignore (testing private member)
         self.assertEqual(act, exp, f"{act} != {exp}")
 
     def test_weirdly_named_actionset_exlam(self):
         inp = r"set A! = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A!", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A!", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_hashpipe(self):
         inp = r"set A# = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A#", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A#", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_prime(self):
         inp = r"set A' = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A'", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A'", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_dash(self):
         inp = r"set A- = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A-", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A-", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_qm(self):
         inp = r"set A? = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A?", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A?", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_circumflex(self):
         inp = r"set A^ = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A^", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A^", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_actionset_underscore(self):
         inp = r"set A_ = {a};"
-        exp = r.Ccs([], [r.ActionSetAssignment("A_", r.ActionSet([r.Action("a")]))])
+        exp = Ccs([], [ActionSetAssignment("A_", ActionSet([Action("a")]))])
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
@@ -113,16 +113,16 @@ class Set_Test(unittest.TestCase):
 class Simple_Grammar_Test(unittest.TestCase):
     def test_simple_process(self):
         inp = "A = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
     def test_simple_prefixed_process(self):
         inp = "A = a.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
-                    "A", r.PrefixedProcess(r.Action("a"), r.NilProcess())
+                ProcessAssignment(
+                    "A", PrefixedProcess(Action("a"), NilProcess())
                 )
             ],
             [],
@@ -132,12 +132,12 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_dual_prefixed_process(self):
         inp = "A = 'a.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.PrefixedProcess(
-                        r.DualAction("a"), r.NilProcess()
+                    PrefixedProcess(
+                        DualAction("a"), NilProcess()
                     ),
                 )
             ],
@@ -148,14 +148,14 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_simple_alternative_process(self):
         inp = "A = a.0 + b.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
-                            r.PrefixedProcess(r.Action("b"), r.NilProcess()),
+                            PrefixedProcess(Action("a"), NilProcess()),
+                            PrefixedProcess(Action("b"), NilProcess()),
                         ]
                     ),
                 )
@@ -167,15 +167,15 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_dual_alternative_process(self):
         inp = "A = a.0 + 'b.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
-                            r.PrefixedProcess(
-                                r.DualAction("b"), r.NilProcess()
+                            PrefixedProcess(Action("a"), NilProcess()),
+                            PrefixedProcess(
+                                DualAction("b"), NilProcess()
                             ),
                         ]
                     ),
@@ -188,14 +188,14 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_simple_parallel_process(self):
         inp = "A = a.0 | b.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.ParallelProcesses(
+                    ParallelProcesses(
                         [
-                            r.PrefixedProcess(r.Action("a"), r.NilProcess()),
-                            r.PrefixedProcess(r.Action("b"), r.NilProcess()),
+                            PrefixedProcess(Action("a"), NilProcess()),
+                            PrefixedProcess(Action("b"), NilProcess()),
                         ]
                     ),
                 )
@@ -207,16 +207,16 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_dual_parallel_process(self):
         inp = "A = 'a.0 | b.0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.ParallelProcesses(
+                    ParallelProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("a"), r.NilProcess()
+                            PrefixedProcess(
+                                DualAction("a"), NilProcess()
                             ),
-                            r.PrefixedProcess(r.Action("b"), r.NilProcess()),
+                            PrefixedProcess(Action("b"), NilProcess()),
                         ]
                     ),
                 )
@@ -228,14 +228,14 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_simple_hiding_process(self):
         inp = r"A = a.0 \ {a, b};"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.PrefixedProcess(
-                        r.Action("a"),
-                        r.HidingProcess(
-                            r.NilProcess(), r.ActionSet([r.Action("a"), r.Action("b")])
+                    PrefixedProcess(
+                        Action("a"),
+                        HidingProcess(
+                            NilProcess(), ActionSet([Action("a"), Action("b")])
                         ),
                     ),
                 )
@@ -247,15 +247,15 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_dual_hiding_process(self):
         inp = r"A = ('a.0) \ {a, b};"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.HidingProcess(
-                        r.PrefixedProcess(
-                            r.DualAction("a"), r.NilProcess()
+                    HidingProcess(
+                        PrefixedProcess(
+                            DualAction("a"), NilProcess()
                         ),
-                        r.ActionSet([r.Action("a"), r.Action("b")]),
+                        ActionSet([Action("a"), Action("b")]),
                     ),
                 )
             ],
@@ -266,15 +266,15 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_ref_hiding_process(self):
         inp = r"A = ('a.0) \ H;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.HidingProcess(
-                        r.PrefixedProcess(
-                            r.DualAction("a"), r.NilProcess()
+                    HidingProcess(
+                        PrefixedProcess(
+                            DualAction("a"), NilProcess()
                         ),
-                        r.ActionSetByName("H"),
+                        ActionSetByName("H"),
                     ),
                 )
             ],
@@ -285,14 +285,14 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_simple_renaming_process(self):
         inp = r"A = a.0[b/a];"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.PrefixedProcess(
-                        r.Action("a"),
-                        r.RenamingProcess(
-                            r.NilProcess(), [(r.Action("b"), r.Action("a"))]
+                    PrefixedProcess(
+                        Action("a"),
+                        RenamingProcess(
+                            NilProcess(), [(Action("b"), Action("a"))]
                         ),
                     ),
                 )
@@ -304,16 +304,16 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_long_renaming_process(self):
         inp = r"A = (a.0)[b/a, d/c, f/e];"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "A",
-                    r.RenamingProcess(
-                        r.PrefixedProcess(r.Action("a"), r.NilProcess()),
+                    RenamingProcess(
+                        PrefixedProcess(Action("a"), NilProcess()),
                         [
-                            (r.Action("b"), r.Action("a")),
-                            (r.Action("d"), r.Action("c")),
-                            (r.Action("f"), r.Action("e")),
+                            (Action("b"), Action("a")),
+                            (Action("d"), Action("c")),
+                            (Action("f"), Action("e")),
                         ],
                     ),
                 )
@@ -325,43 +325,43 @@ class Simple_Grammar_Test(unittest.TestCase):
 
     def test_weirdly_named_process_exlam(self):
         inp = r"A! = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A!", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A!", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_hashpipe(self):
         inp = r"A# = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A#", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A#", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_prime(self):
         inp = r"A' = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A'", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A'", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_dash(self):
         inp = r"A- = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A-", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A-", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_qm(self):
         inp = r"A? = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A?", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A?", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_circumflex(self):
         inp = r"A^ = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A^", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A^", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
     
     def test_weirdly_named_process_underscore(self):
         inp = r"A_ = 0;"
-        exp = r.Ccs([r.ProcessAssignment("A_", r.NilProcess())], [])
+        exp = Ccs([ProcessAssignment("A_", NilProcess())], [])
         act = g.parse(inp)
         self.assertEqual(exp, act)
 
@@ -369,23 +369,23 @@ class Simple_Grammar_Test(unittest.TestCase):
 class Complex_Grammar_Test(unittest.TestCase):
     def test_multi_prefix_alternative_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Testcase",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("a"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b"),
-                                    r.ProcessByName("One"),
+                            PrefixedProcess(
+                                Action("a"),
+                                PrefixedProcess(
+                                    DualAction("b"),
+                                    ProcessByName("One"),
                                 ),
                             ),
-                            r.PrefixedProcess(
-                                r.DualAction("a"),
-                                r.PrefixedProcess(
-                                    r.Action("b"), r.ProcessByName("Two")
+                            PrefixedProcess(
+                                DualAction("a"),
+                                PrefixedProcess(
+                                    Action("b"), ProcessByName("Two")
                                 ),
                             ),
                         ]
@@ -399,36 +399,36 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_multi_alternatives_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two + a.b.Three + 'a.'b.Four;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Testcase",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("a"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b"),
-                                    r.ProcessByName("One"),
+                            PrefixedProcess(
+                                Action("a"),
+                                PrefixedProcess(
+                                    DualAction("b"),
+                                    ProcessByName("One"),
                                 ),
                             ),
-                            r.PrefixedProcess(
-                                r.DualAction("a"),
-                                r.PrefixedProcess(
-                                    r.Action("b"), r.ProcessByName("Two")
+                            PrefixedProcess(
+                                DualAction("a"),
+                                PrefixedProcess(
+                                    Action("b"), ProcessByName("Two")
                                 ),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("a"),
-                                r.PrefixedProcess(
-                                    r.Action("b"), r.ProcessByName("Three")
+                            PrefixedProcess(
+                                Action("a"),
+                                PrefixedProcess(
+                                    Action("b"), ProcessByName("Three")
                                 ),
                             ),
-                            r.PrefixedProcess(
-                                r.DualAction("a"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b"),
-                                    r.ProcessByName("Four"),
+                            PrefixedProcess(
+                                DualAction("a"),
+                                PrefixedProcess(
+                                    DualAction("b"),
+                                    ProcessByName("Four"),
                                 ),
                             ),
                         ]
@@ -442,29 +442,29 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_alternatives_renaming_process(self):
         inp = "Testcase = (a.'b.One)[x/y] + 'a.b.Two[x/y];"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Testcase",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.RenamingProcess(
-                                r.PrefixedProcess(
-                                    r.Action("a"),
-                                    r.PrefixedProcess(
-                                        r.DualAction("b"),
-                                        r.ProcessByName("One"),
+                            RenamingProcess(
+                                PrefixedProcess(
+                                    Action("a"),
+                                    PrefixedProcess(
+                                        DualAction("b"),
+                                        ProcessByName("One"),
                                     ),
                                 ),
-                                [(r.Action("x"), r.Action("y"))],
+                                [(Action("x"), Action("y"))],
                             ),
-                            r.PrefixedProcess(
-                                r.DualAction("a"),
-                                r.PrefixedProcess(
-                                    r.Action("b"),
-                                    r.RenamingProcess(
-                                        r.ProcessByName("Two"),
-                                        [(r.Action("x"), r.Action("y"))],
+                            PrefixedProcess(
+                                DualAction("a"),
+                                PrefixedProcess(
+                                    Action("b"),
+                                    RenamingProcess(
+                                        ProcessByName("Two"),
+                                        [(Action("x"), Action("y"))],
                                     ),
                                 ),
                             ),
@@ -479,17 +479,17 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_complex_processA(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y];"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "TestcaseComplex1",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.RenamingProcess(
-                                r.ProcessByName("A"), [(r.Action("x"), r.Action("y"))]
+                            RenamingProcess(
+                                ProcessByName("A"), [(Action("x"), Action("y"))]
                             ),
-                            r.RenamingProcess(
-                                r.ProcessByName("B"), [(r.Action("x"), r.Action("y"))]
+                            RenamingProcess(
+                                ProcessByName("B"), [(Action("x"), Action("y"))]
                             ),
                         ]
                     ),
@@ -503,21 +503,21 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_complex_processB(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y] \\ L;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "TestcaseComplex1",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.RenamingProcess(
-                                r.ProcessByName("A"), [(r.Action("x"), r.Action("y"))]
+                            RenamingProcess(
+                                ProcessByName("A"), [(Action("x"), Action("y"))]
                             ),
-                            r.HidingProcess(
-                                r.RenamingProcess(
-                                    r.ProcessByName("B"),
-                                    [(r.Action("x"), r.Action("y"))],
+                            HidingProcess(
+                                RenamingProcess(
+                                    ProcessByName("B"),
+                                    [(Action("x"), Action("y"))],
                                 ),
-                                r.ActionSetByName("L"),
+                                ActionSetByName("L"),
                             ),
                         ]
                     ),
@@ -531,25 +531,25 @@ class Complex_Grammar_Test(unittest.TestCase):
 
     def test_complex_processC(self):
         inp = "TestcaseComplex1 = (A)[x/y] + (B[x/y]) \\ L | 0;"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "TestcaseComplex1",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.RenamingProcess(
-                                r.ProcessByName("A"), [(r.Action("x"), r.Action("y"))]
+                            RenamingProcess(
+                                ProcessByName("A"), [(Action("x"), Action("y"))]
                             ),
-                            r.ParallelProcesses(
+                            ParallelProcesses(
                                 [
-                                    r.HidingProcess(
-                                        r.RenamingProcess(
-                                            r.ProcessByName("B"),
-                                            [(r.Action("x"), r.Action("y"))],
+                                    HidingProcess(
+                                        RenamingProcess(
+                                            ProcessByName("B"),
+                                            [(Action("x"), Action("y"))],
                                         ),
-                                        r.ActionSetByName("L"),
+                                        ActionSetByName("L"),
                                     ),
-                                    r.NilProcess(),
+                                    NilProcess(),
                                 ]
                             ),
                         ]
@@ -567,36 +567,36 @@ class Complex_Grammar_Test(unittest.TestCase):
         inp = (
             "Testcase = (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
         )
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Testcase",
-                    r.HidingProcess(
-                        r.RenamingProcess(
-                            r.AlternativeProcesses(
+                    HidingProcess(
+                        RenamingProcess(
+                            AlternativeProcesses(
                                 [
-                                    r.PrefixedProcess(
-                                        r.Action("x"),
-                                        r.PrefixedProcess(
-                                            r.Action("y"),
-                                            r.PrefixedProcess(
-                                                r.Action("z"), r.ProcessByName("Test")
+                                    PrefixedProcess(
+                                        Action("x"),
+                                        PrefixedProcess(
+                                            Action("y"),
+                                            PrefixedProcess(
+                                                Action("z"), ProcessByName("Test")
                                             ),
                                         ),
                                     ),
-                                    r.ParallelProcesses(
+                                    ParallelProcesses(
                                         [
-                                            r.PrefixedProcess(
-                                                r.DualAction("a"),
-                                                r.PrefixedProcess(
-                                                    r.DualAction("b"),
-                                                    r.NilProcess(),
+                                            PrefixedProcess(
+                                                DualAction("a"),
+                                                PrefixedProcess(
+                                                    DualAction("b"),
+                                                    NilProcess(),
                                                 ),
                                             ),
-                                            r.PrefixedProcess(
-                                                r.Action("a"),
-                                                r.PrefixedProcess(
-                                                    r.Action("b"), r.ProcessByName("A")
+                                            PrefixedProcess(
+                                                Action("a"),
+                                                PrefixedProcess(
+                                                    Action("b"), ProcessByName("A")
                                                 ),
                                             ),
                                         ]
@@ -604,12 +604,12 @@ class Complex_Grammar_Test(unittest.TestCase):
                                 ]
                             ),
                             [
-                                (r.Action("a"), r.Action("b")),
-                                (r.Action("b"), r.Action("a")),
-                                (r.Action("x"), r.Action("x")),
+                                (Action("a"), Action("b")),
+                                (Action("b"), Action("a")),
+                                (Action("x"), Action("x")),
                             ],
                         ),
-                        r.ActionSet(list(map(r.Action, ["a", "b", "c"]))),
+                        ActionSet(list(map(Action, ["a", "b", "c"]))),
                     ),
                 )
             ],
@@ -621,67 +621,67 @@ class Complex_Grammar_Test(unittest.TestCase):
     # @unittest.skip("too slow.")
     def test_complex_processE(self):
         inp = "Testcase = ((a.'b.One)[x/y] + ('a.(b.Two[x/y])) \\ L) | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Testcase",
-                    r.ParallelProcesses(
+                    ParallelProcesses(
                         [
-                            r.AlternativeProcesses(
+                            AlternativeProcesses(
                                 [
-                                    r.RenamingProcess(
-                                        r.PrefixedProcess(
-                                            r.Action("a"),
-                                            r.PrefixedProcess(
-                                                r.DualAction("b"),
-                                                r.ProcessByName("One"),
+                                    RenamingProcess(
+                                        PrefixedProcess(
+                                            Action("a"),
+                                            PrefixedProcess(
+                                                DualAction("b"),
+                                                ProcessByName("One"),
                                             ),
                                         ),
-                                        [(r.Action("x"), r.Action("y"))],
+                                        [(Action("x"), Action("y"))],
                                     ),
-                                    r.HidingProcess(
-                                        r.PrefixedProcess(
-                                            r.DualAction("a"),
-                                            r.PrefixedProcess(
-                                                r.Action("b"),
-                                                r.RenamingProcess(
-                                                    r.ProcessByName("Two"),
-                                                    [(r.Action("x"), r.Action("y"))],
+                                    HidingProcess(
+                                        PrefixedProcess(
+                                            DualAction("a"),
+                                            PrefixedProcess(
+                                                Action("b"),
+                                                RenamingProcess(
+                                                    ProcessByName("Two"),
+                                                    [(Action("x"), Action("y"))],
                                                 ),
                                             ),
                                         ),
-                                        r.ActionSetByName("L"),
+                                        ActionSetByName("L"),
                                     ),
                                 ]
                             ),
-                            r.HidingProcess(
-                                r.RenamingProcess(
-                                    r.AlternativeProcesses(
+                            HidingProcess(
+                                RenamingProcess(
+                                    AlternativeProcesses(
                                         [
-                                            r.PrefixedProcess(
-                                                r.Action("x"),
-                                                r.PrefixedProcess(
-                                                    r.Action("y"),
-                                                    r.PrefixedProcess(
-                                                        r.Action("z"),
-                                                        r.ProcessByName("Test"),
+                                            PrefixedProcess(
+                                                Action("x"),
+                                                PrefixedProcess(
+                                                    Action("y"),
+                                                    PrefixedProcess(
+                                                        Action("z"),
+                                                        ProcessByName("Test"),
                                                     ),
                                                 ),
                                             ),
-                                            r.ParallelProcesses(
+                                            ParallelProcesses(
                                                 [
-                                                    r.PrefixedProcess(
-                                                        r.DualAction("a"),
-                                                        r.PrefixedProcess(
-                                                            r.DualAction("b"),
-                                                            r.NilProcess(),
+                                                    PrefixedProcess(
+                                                        DualAction("a"),
+                                                        PrefixedProcess(
+                                                            DualAction("b"),
+                                                            NilProcess(),
                                                         ),
                                                     ),
-                                                    r.PrefixedProcess(
-                                                        r.Action("a"),
-                                                        r.PrefixedProcess(
-                                                            r.Action("b"),
-                                                            r.ProcessByName("A"),
+                                                    PrefixedProcess(
+                                                        Action("a"),
+                                                        PrefixedProcess(
+                                                            Action("b"),
+                                                            ProcessByName("A"),
                                                         ),
                                                     ),
                                                 ]
@@ -689,12 +689,12 @@ class Complex_Grammar_Test(unittest.TestCase):
                                         ]
                                     ),
                                     [
-                                        (r.Action("a"), r.Action("b")),
-                                        (r.Action("b"), r.Action("a")),
-                                        (r.Action("x"), r.Action("x")),
+                                        (Action("a"), Action("b")),
+                                        (Action("b"), Action("a")),
+                                        (Action("x"), Action("x")),
                                     ],
                                 ),
-                                r.ActionSet(list(map(r.Action, ["a", "b", "c"]))),
+                                ActionSet(list(map(Action, ["a", "b", "c"]))),
                             ),
                         ]
                     ),
@@ -712,13 +712,13 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
             B = b.0;
             set C = {a, b, c};
         """
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment("A", r.PrefixedProcess(r.Action("a"), r.NilProcess())),
-                r.ProcessAssignment("B", r.PrefixedProcess(r.Action("b"), r.NilProcess())),
+                ProcessAssignment("A", PrefixedProcess(Action("a"), NilProcess())),
+                ProcessAssignment("B", PrefixedProcess(Action("b"), NilProcess())),
             ],
             [
-                r.ActionSetAssignment("C", r.ActionSet(list(map(r.Action, ["a", "b", "c"]))))
+                ActionSetAssignment("C", ActionSet(list(map(Action, ["a", "b", "c"]))))
             ],
         )
         act = g.parse(inp)
@@ -730,91 +730,91 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
         with open(inputdir / "res" / "basic_buffer.ccs") as f:
             inp = f.read()
 
-        exp = r.Ccs([
-            r.ProcessAssignment(
+        exp = Ccs([
+            ProcessAssignment(
                 "Buff3", 
-                r.HidingProcess(
-                    r.ParallelProcesses(
-                        list(map(r.ProcessByName, ["C0", "C1", "C2"]))
+                HidingProcess(
+                    ParallelProcesses(
+                        list(map(ProcessByName, ["C0", "C1", "C2"]))
                     ),
-                    r.ActionSet(
-                        list(map(r.Action, ["c", "d"]))
+                    ActionSet(
+                        list(map(Action, ["c", "d"]))
                     )
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "C0",
-                r.RenamingProcess(
-                    r.ProcessByName("Cell"),
+                RenamingProcess(
+                    ProcessByName("Cell"),
                     [
-                        (r.Action("c"), r.Action("b")),
+                        (Action("c"), Action("b")),
                     ]
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "C1",
-                r.RenamingProcess(
-                    r.ProcessByName("Cell"),
+                RenamingProcess(
+                    ProcessByName("Cell"),
                     [
-                        (r.Action("c"), r.Action("a")),
-                        (r.Action("d"), r.Action("b")),
+                        (Action("c"), Action("a")),
+                        (Action("d"), Action("b")),
                     ]
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "C2",
-                r.RenamingProcess(
-                    r.ProcessByName("Cell"),
+                RenamingProcess(
+                    ProcessByName("Cell"),
                     [
-                        (r.Action("d"), r.Action("a")),
+                        (Action("d"), Action("a")),
                     ]
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "Cell",
-                r.PrefixedProcess(
-                    r.Action("a"),
-                    r.PrefixedProcess(
-                        r.DualAction("b"),
-                        r.ProcessByName("Cell")
+                PrefixedProcess(
+                    Action("a"),
+                    PrefixedProcess(
+                        DualAction("b"),
+                        ProcessByName("Cell")
                     )
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "Spec",
-                r.PrefixedProcess(
-                    r.Action("a"),
-                    r.ProcessByName("Spec'")
+                PrefixedProcess(
+                    Action("a"),
+                    ProcessByName("Spec'")
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "Spec'",
-                r.AlternativeProcesses(
+                AlternativeProcesses(
                     [
-                        r.PrefixedProcess(
-                            r.DualAction("b"),
-                            r.ProcessByName("Spec")
+                        PrefixedProcess(
+                            DualAction("b"),
+                            ProcessByName("Spec")
                         ),
-                        r.PrefixedProcess(
-                            r.Action("a"),
-                            r.ProcessByName("Spec''")
+                        PrefixedProcess(
+                            Action("a"),
+                            ProcessByName("Spec''")
                         )
                     ]
                 )
             ),
-            r.ProcessAssignment(
+            ProcessAssignment(
                 "Spec''",
-                r.AlternativeProcesses(
+                AlternativeProcesses(
                     [
-                        r.PrefixedProcess(
-                            r.DualAction("b"),
-                            r.ProcessByName("Spec'")
+                        PrefixedProcess(
+                            DualAction("b"),
+                            ProcessByName("Spec'")
                         ),
-                        r.PrefixedProcess(
-                            r.Action("a"),
-                            r.PrefixedProcess(
-                                r.DualAction("b"),
-                                r.ProcessByName("Spec''")
+                        PrefixedProcess(
+                            Action("a"),
+                            PrefixedProcess(
+                                DualAction("b"),
+                                ProcessByName("Spec''")
                             )
                         )
                     ]
@@ -830,274 +830,274 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
         with open(inputdir / "res" / "dekker.ccs") as f:
             inp = f.read()
 
-        exp = r.Ccs(
+        exp = Ccs(
             [
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "B1f",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("b1rf"),
-                                r.ProcessByName("B1f"),
+                            PrefixedProcess(
+                                DualAction("b1rf"),
+                                ProcessByName("B1f"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b1wf"),
-                                r.ProcessByName("B1f"),
+                            PrefixedProcess(
+                                Action("b1wf"),
+                                ProcessByName("B1f"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b1wt"),
-                                r.ProcessByName("B1t"),
+                            PrefixedProcess(
+                                Action("b1wt"),
+                                ProcessByName("B1t"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "B1t",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("b1rt"),
-                                r.ProcessByName("B1t"),
+                            PrefixedProcess(
+                                DualAction("b1rt"),
+                                ProcessByName("B1t"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b1wt"),
-                                r.ProcessByName("B1t"),
+                            PrefixedProcess(
+                                Action("b1wt"),
+                                ProcessByName("B1t"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b1wf"),
-                                r.ProcessByName("B1f"),
+                            PrefixedProcess(
+                                Action("b1wf"),
+                                ProcessByName("B1f"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "B2f",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("b2rf"),
-                                r.ProcessByName("B2f"),
+                            PrefixedProcess(
+                                DualAction("b2rf"),
+                                ProcessByName("B2f"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b2wf"),
-                                r.ProcessByName("B2f"),
+                            PrefixedProcess(
+                                Action("b2wf"),
+                                ProcessByName("B2f"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b2wt"),
-                                r.ProcessByName("B2t"),
+                            PrefixedProcess(
+                                Action("b2wt"),
+                                ProcessByName("B2t"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "B2t",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("b2rt"),
-                                r.ProcessByName("B2t"),
+                            PrefixedProcess(
+                                DualAction("b2rt"),
+                                ProcessByName("B2t"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b2wt"),
-                                r.ProcessByName("B2t"),
+                            PrefixedProcess(
+                                Action("b2wt"),
+                                ProcessByName("B2t"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b2wf"),
-                                r.ProcessByName("B2f"),
+                            PrefixedProcess(
+                                Action("b2wf"),
+                                ProcessByName("B2f"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "K1",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("kr1"),
-                                r.ProcessByName("K1"),
+                            PrefixedProcess(
+                                DualAction("kr1"),
+                                ProcessByName("K1"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kw1"),
-                                r.ProcessByName("K1"),
+                            PrefixedProcess(
+                                Action("kw1"),
+                                ProcessByName("K1"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kw2"),
-                                r.ProcessByName("K2"),
+                            PrefixedProcess(
+                                Action("kw2"),
+                                ProcessByName("K2"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "K2",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.DualAction("kr2"),
-                                r.ProcessByName("K2"),
+                            PrefixedProcess(
+                                DualAction("kr2"),
+                                ProcessByName("K2"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kw2"),
-                                r.ProcessByName("K2"),
+                            PrefixedProcess(
+                                Action("kw2"),
+                                ProcessByName("K2"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kw1"),
-                                r.ProcessByName("K1"),
+                            PrefixedProcess(
+                                Action("kw1"),
+                                ProcessByName("K1"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P1",
-                    r.PrefixedProcess(
-                        r.DualAction("b1wt"),
-                        r.ProcessByName("P11"),
+                    PrefixedProcess(
+                        DualAction("b1wt"),
+                        ProcessByName("P11"),
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P11",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("b2rf"),
-                                r.ProcessByName("P14"),
+                            PrefixedProcess(
+                                Action("b2rf"),
+                                ProcessByName("P14"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b2rt"),
-                                r.ProcessByName("P12"),
+                            PrefixedProcess(
+                                Action("b2rt"),
+                                ProcessByName("P12"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P12",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("kr1"),
-                                r.ProcessByName("P11"),
+                            PrefixedProcess(
+                                Action("kr1"),
+                                ProcessByName("P11"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kr2"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b1wf"),
-                                    r.ProcessByName("P13"),
+                            PrefixedProcess(
+                                Action("kr2"),
+                                PrefixedProcess(
+                                    DualAction("b1wf"),
+                                    ProcessByName("P13"),
                                 ),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P13",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("kr2"),
-                                r.ProcessByName("P13"),
+                            PrefixedProcess(
+                                Action("kr2"),
+                                ProcessByName("P13"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kr1"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b1wt"),
-                                    r.ProcessByName("P11"),
+                            PrefixedProcess(
+                                Action("kr1"),
+                                PrefixedProcess(
+                                    DualAction("b1wt"),
+                                    ProcessByName("P11"),
                                 ),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P14",
-                    r.PrefixedProcess(
-                        r.Action("enter"),
-                        r.PrefixedProcess(
-                            r.Action("exit"),
-                            r.PrefixedProcess(
-                                r.DualAction("kw2"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b1wf"),
-                                    r.ProcessByName("P1"),
+                    PrefixedProcess(
+                        Action("enter"),
+                        PrefixedProcess(
+                            Action("exit"),
+                            PrefixedProcess(
+                                DualAction("kw2"),
+                                PrefixedProcess(
+                                    DualAction("b1wf"),
+                                    ProcessByName("P1"),
                                 ),
                             ),
                         ),
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P2",
-                    r.PrefixedProcess(
-                        r.DualAction("b2wt"),
-                        r.ProcessByName("P21"),
+                    PrefixedProcess(
+                        DualAction("b2wt"),
+                        ProcessByName("P21"),
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P21",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("b1rf"),
-                                r.ProcessByName("P24"),
+                            PrefixedProcess(
+                                Action("b1rf"),
+                                ProcessByName("P24"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("b1rt"),
-                                r.ProcessByName("P22"),
+                            PrefixedProcess(
+                                Action("b1rt"),
+                                ProcessByName("P22"),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P22",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("kr2"),
-                                r.ProcessByName("P21"),
+                            PrefixedProcess(
+                                Action("kr2"),
+                                ProcessByName("P21"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kr1"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b2wf"),
-                                    r.ProcessByName("P23"),
+                            PrefixedProcess(
+                                Action("kr1"),
+                                PrefixedProcess(
+                                    DualAction("b2wf"),
+                                    ProcessByName("P23"),
                                 ),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P23",
-                    r.AlternativeProcesses(
+                    AlternativeProcesses(
                         [
-                            r.PrefixedProcess(
-                                r.Action("kr1"),
-                                r.ProcessByName("P23"),
+                            PrefixedProcess(
+                                Action("kr1"),
+                                ProcessByName("P23"),
                             ),
-                            r.PrefixedProcess(
-                                r.Action("kr2"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b2wt"),
-                                    r.ProcessByName("P21"),
+                            PrefixedProcess(
+                                Action("kr2"),
+                                PrefixedProcess(
+                                    DualAction("b2wt"),
+                                    ProcessByName("P21"),
                                 ),
                             ),
                         ]
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "P24",
-                    r.PrefixedProcess(
-                        r.Action("enter"),
-                        r.PrefixedProcess(
-                            r.Action("exit"),
-                            r.PrefixedProcess(
-                                r.DualAction("kw1"),
-                                r.PrefixedProcess(
-                                    r.DualAction("b2wf"),
-                                    r.ProcessByName("P2"),
+                    PrefixedProcess(
+                        Action("enter"),
+                        PrefixedProcess(
+                            Action("exit"),
+                            PrefixedProcess(
+                                DualAction("kw1"),
+                                PrefixedProcess(
+                                    DualAction("b2wf"),
+                                    ProcessByName("P2"),
                                 ),
                             ),
                         ),
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Pre-Dekker-2",
-                    r.ParallelProcesses(
-                        list(map(r.ProcessByName, [
+                    ParallelProcesses(
+                        list(map(ProcessByName, [
                             "P1",
                             "P2",
                             "K1",
@@ -1106,29 +1106,29 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
                         ]))
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Dekker-2",
-                    r.HidingProcess(
-                        r.ProcessByName("Pre-Dekker-2"),
-                        r.ActionSetByName("L"),
+                    HidingProcess(
+                        ProcessByName("Pre-Dekker-2"),
+                        ActionSetByName("L"),
                     ),
                 ),
-                r.ProcessAssignment(
+                ProcessAssignment(
                     "Spec",
-                    r.PrefixedProcess(
-                        r.Action("enter"),
-                        r.PrefixedProcess(
-                            r.Action("exit"),
-                            r.ProcessByName("Spec"),
+                    PrefixedProcess(
+                        Action("enter"),
+                        PrefixedProcess(
+                            Action("exit"),
+                            ProcessByName("Spec"),
                         ),
                     ),
                 ),
             ],
             [
-                r.ActionSetAssignment(
+                ActionSetAssignment(
                     "L",
-                    r.ActionSet(
-                        list(map(r.Action, [
+                    ActionSet(
+                        list(map(Action, [
                             "b1rf",
                             "b1rt",
                             "b1wf",
