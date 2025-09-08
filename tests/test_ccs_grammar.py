@@ -68,56 +68,56 @@ class Test_Set():
 
     def test_weirdly_named_actionset_exlam(self):
         inp = r"set A! = {a};"
-        exp = Ccs([], [ActionSetAssignment("A!", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A!", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_hashpipe(self):
         inp = r"set A# = {a};"
-        exp = Ccs([], [ActionSetAssignment("A#", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A#", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_prime(self):
         inp = r"set A' = {a};"
-        exp = Ccs([], [ActionSetAssignment("A'", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A'", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_dash(self):
         inp = r"set A- = {a};"
-        exp = Ccs([], [ActionSetAssignment("A-", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A-", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_qm(self):
         inp = r"set A? = {a};"
-        exp = Ccs([], [ActionSetAssignment("A?", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A?", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_circumflex(self):
         inp = r"set A^ = {a};"
-        exp = Ccs([], [ActionSetAssignment("A^", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A^", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_actionset_underscore(self):
         inp = r"set A_ = {a};"
-        exp = Ccs([], [ActionSetAssignment("A_", ActionSet([Action("a")]))])
+        exp = CcsRepresentation([], [ActionSetAssignment("A_", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
 
 class Test_Simple_Grammar():
     def test_simple_process(self):
         inp = "A = 0;"
-        exp = Ccs([ProcessAssignment("A", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
 
     def test_simple_prefixed_process(self):
         inp = "A = a.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A", PrefixedProcess(Action("a"), NilProcess())
@@ -130,7 +130,7 @@ class Test_Simple_Grammar():
 
     def test_dual_prefixed_process(self):
         inp = "A = 'a.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -146,7 +146,7 @@ class Test_Simple_Grammar():
 
     def test_simple_alternative_process(self):
         inp = "A = a.0 + b.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -165,7 +165,7 @@ class Test_Simple_Grammar():
 
     def test_dual_alternative_process(self):
         inp = "A = a.0 + 'b.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -186,7 +186,7 @@ class Test_Simple_Grammar():
 
     def test_simple_parallel_process(self):
         inp = "A = a.0 | b.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -205,7 +205,7 @@ class Test_Simple_Grammar():
 
     def test_dual_parallel_process(self):
         inp = "A = 'a.0 | b.0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -226,7 +226,7 @@ class Test_Simple_Grammar():
 
     def test_simple_hiding_process(self):
         inp = r"A = a.0 \ {a, b};"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -245,7 +245,7 @@ class Test_Simple_Grammar():
 
     def test_dual_hiding_process(self):
         inp = r"A = ('a.0) \ {a, b};"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -264,7 +264,7 @@ class Test_Simple_Grammar():
 
     def test_ref_hiding_process(self):
         inp = r"A = ('a.0) \ H;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -283,7 +283,7 @@ class Test_Simple_Grammar():
 
     def test_simple_renaming_process(self):
         inp = r"A = a.0[b/a];"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -302,7 +302,7 @@ class Test_Simple_Grammar():
 
     def test_long_renaming_process(self):
         inp = r"A = (a.0)[b/a, d/c, f/e];"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "A",
@@ -323,50 +323,50 @@ class Test_Simple_Grammar():
 
     def test_weirdly_named_process_exlam(self):
         inp = r"A! = 0;"
-        exp = Ccs([ProcessAssignment("A!", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A!", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_hashpipe(self):
         inp = r"A# = 0;"
-        exp = Ccs([ProcessAssignment("A#", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A#", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_prime(self):
         inp = r"A' = 0;"
-        exp = Ccs([ProcessAssignment("A'", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A'", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_dash(self):
         inp = r"A- = 0;"
-        exp = Ccs([ProcessAssignment("A-", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A-", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_qm(self):
         inp = r"A? = 0;"
-        exp = Ccs([ProcessAssignment("A?", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A?", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_circumflex(self):
         inp = r"A^ = 0;"
-        exp = Ccs([ProcessAssignment("A^", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A^", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
     def test_weirdly_named_process_underscore(self):
         inp = r"A_ = 0;"
-        exp = Ccs([ProcessAssignment("A_", NilProcess())], [])
+        exp = CcsRepresentation([ProcessAssignment("A_", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
 
 class Test_Complex_Grammar():
     def test_multi_prefix_alternative_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "Testcase",
@@ -396,7 +396,7 @@ class Test_Complex_Grammar():
 
     def test_multi_alternatives_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two + a.b.Three + 'a.'b.Four;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "Testcase",
@@ -439,7 +439,7 @@ class Test_Complex_Grammar():
 
     def test_alternatives_renaming_process(self):
         inp = "Testcase = (a.'b.One)[x/y] + 'a.b.Two[x/y];"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "Testcase",
@@ -476,7 +476,7 @@ class Test_Complex_Grammar():
 
     def test_complex_processA(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y];"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
@@ -500,7 +500,7 @@ class Test_Complex_Grammar():
 
     def test_complex_processB(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y] \\ L;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
@@ -528,7 +528,7 @@ class Test_Complex_Grammar():
 
     def test_complex_processC(self):
         inp = "TestcaseComplex1 = (A)[x/y] + (B[x/y]) \\ L | 0;"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
@@ -564,7 +564,7 @@ class Test_Complex_Grammar():
         inp = (
             "Testcase = (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
         )
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "Testcase",
@@ -618,7 +618,7 @@ class Test_Complex_Grammar():
     # @unittest.skip("too slow.")
     def test_complex_processE(self):
         inp = "Testcase = ((a.'b.One)[x/y] + ('a.(b.Two[x/y])) \\ L) | (((x.y.z.Test) + 'a.'b.0 | a.b.A)[a/b, b/a, x/x]) \\ {a, b, c};"
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "Testcase",
@@ -709,7 +709,7 @@ class Test_Ccs_Input_Grammar():
             B = b.0;
             set C = {a, b, c};
         """
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment("A", PrefixedProcess(Action("a"), NilProcess())),
                 ProcessAssignment("B", PrefixedProcess(Action("b"), NilProcess())),
@@ -727,7 +727,7 @@ class Test_Ccs_Input_Grammar():
         with open(inputdir / "res" / "basic_buffer.ccs") as f:
             inp = f.read()
 
-        exp = Ccs([
+        exp = CcsRepresentation([
             ProcessAssignment(
                 "Buff3", 
                 HidingProcess(
@@ -827,7 +827,7 @@ class Test_Ccs_Input_Grammar():
         with open(inputdir / "res" / "dekker.ccs") as f:
             inp = f.read()
 
-        exp = Ccs(
+        exp = CcsRepresentation(
             [
                 ProcessAssignment(
                     "B1f",

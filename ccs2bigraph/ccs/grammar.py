@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 import pyparsing as pp
 import typing as tp
 
-from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, Ccs, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
+from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, CcsRepresentation, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
 
 # Performance
 pp.ParserElement.enable_packrat()
@@ -168,8 +168,8 @@ _process_assignment.setParseAction(_process_assignment_parse_action)
 _ccs = pp.ZeroOrMore(_process_assignment | _actionset_assignment)
 _ccs.ignore(_comment)
 
-def _ccs_parse_action(pr: pp.ParseResults) -> Ccs:
-    res = Ccs(
+def _ccs_parse_action(pr: pp.ParseResults) -> CcsRepresentation:
+    res = CcsRepresentation(
         list(filter(lambda r: isinstance(r, ProcessAssignment), pr)), # pyright: ignore[reportUnnecessaryIsInstance]
         list(filter(lambda r: isinstance(r, ActionSetAssignment), pr)) # pyright: ignore[reportUnnecessaryIsInstance]
     )
@@ -178,9 +178,9 @@ def _ccs_parse_action(pr: pp.ParseResults) -> Ccs:
 
 _ccs.set_parse_action(_ccs_parse_action)
 
-def parse(raw: str) -> Ccs:
+def parse(raw: str) -> CcsRepresentation:
     """CCS Process file (c.f. CAAL input) parsing"""
     logger.info(f"Trying to parse {raw}")
-    res = tp.cast(Ccs, _ccs.parse_string(raw, True)[0])
+    res = tp.cast(CcsRepresentation, _ccs.parse_string(raw, True)[0])
     logger.info(f"Done parsing {raw}")
     return res

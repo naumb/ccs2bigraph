@@ -249,7 +249,7 @@ class ProcessAssignment:
         return f"{self.name} = {self.process};"
     
 @dataclass(frozen=True)
-class Ccs:
+class CcsRepresentation:
     """
     Representation a closed CCS expression.
 
