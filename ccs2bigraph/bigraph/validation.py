@@ -50,8 +50,8 @@ class BigraphValidator:
                     else: return _validate_existing_controls_helper(inner, controls)
                 case MergedBigraphs(merging=merging):
                     return all([_validate_existing_controls_helper(m, controls) for m in merging])
-                case MergedBigraphs(merging=merging):
-                    return all([_validate_existing_controls_helper(m, controls) for m in merging])
+                case ParallelBigraphs(parallel=parallel):
+                    return all([_validate_existing_controls_helper(p, controls) for p in parallel])
                 case _:
                     raise ValueError(f"{current} is not a Bigraph.")
             return False
@@ -77,8 +77,8 @@ class BigraphValidator:
                     else: return _validate_connected_ports_helper(inner, controls)
                 case MergedBigraphs(merging=merging):
                     return all([_validate_connected_ports_helper(m, controls) for m in merging])
-                case MergedBigraphs(merging=merging):
-                    return all([_validate_connected_ports_helper(m, controls) for m in merging])
+                case ParallelBigraphs(parallel=parallel):
+                    return all([_validate_connected_ports_helper(p, controls) for p in parallel])
                 case _:
                     raise ValueError(f"{current} is not a Bigraph.")
             return False
