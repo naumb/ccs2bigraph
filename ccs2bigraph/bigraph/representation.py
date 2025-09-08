@@ -241,4 +241,16 @@ class BigraphByName(object):
     
     def __str__(self):
         return self.name
+    
+@dataclass(frozen=True)
+class BigraphRepresentation(object):
+    """
+    Refers to a complete representation of a Bigraphical System.
+
+    :param list[ControlDefinition] controls: List of the controls used in this representation
+    :param list[BigraphAssignment] bigraphs: List of defined bigraphs in this representation
+    """
+
+    controls: list[ControlDefinition]
+    bigraphs: list[BigraphAssignment]
 
