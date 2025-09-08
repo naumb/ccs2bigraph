@@ -3,7 +3,8 @@
 
     "python.testing.pytestArgs": [
         "--cov=ccs2bigraph",
-        "--cov-report=term-missing"
+        "--cov-report=term-missing",
+        "--doctest-modules",
     ],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false
