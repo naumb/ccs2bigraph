@@ -24,10 +24,14 @@ class BigraphValidator:
     content: BigraphRepresentation
 
     def validate(self) -> bool:
-        return all([
+        logger.info(f"Validating {self.content}.")
+        res = all([
             self._validate_existing_controls(),
             self._validate_connected_ports(),
         ])
+        if res: logger.info(f"Validation of {self.content} successful")
+        else: logger.warning(f"Validation of {self.content} failed!")
+        return res
     
     def _validate_existing_controls(self) -> bool:
         def _validate_existing_controls_helper(current: Bigraph, controls: list[Control]) -> bool:
