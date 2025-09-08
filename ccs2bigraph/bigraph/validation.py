@@ -67,8 +67,9 @@ class BigraphValidator:
                 case IdBigraph():
                     return True #TODO: is this correct?
                 case ControlBigraph(control=control, links=links):
-                    control_type = list(filter(lambda c: c.name == control.name, controls))[0]
-                    if len(links) == control_type.arity: return True
+                    matching_controls = list(filter(lambda c: c.name == control.name, controls))
+                    if len(matching_controls) != 1: return False
+                    if len(links) == matching_controls[0].arity: return True
                 case ClosedBigraph(link=_, bigraph=bigraph):
                     return _validate_connected_ports_helper(bigraph, controls)
                 case NestingBigraph(control=control, inner=inner):
@@ -84,3 +85,9 @@ class BigraphValidator:
 
         controls = [c.control for c in self.content.controls]
         return all([_validate_connected_ports_helper(b.bigraph, controls) for b in self.content.bigraphs])
+    
+    def _validate_is_ground(self) -> bool:
+        def _validate_is_ground_helper(current: Bigraph) -> bool:
+            return True
+        
+        return all([_validate_is_ground_helper(b.bigraph) for b in self.content.bigraphs])
