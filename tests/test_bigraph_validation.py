@@ -1,5 +1,7 @@
 """Bigraph Validation Tests"""
 
+import pytest
+
 from ccs2bigraph.bigraph.validation import *
 from ccs2bigraph.bigraph.representation import *
 
@@ -105,6 +107,33 @@ class Test_Simple_Bigraph_Validation():
         )
         assert BigraphValidator(inp).validate() == False
 
+    def test_id_bigraph(self):
+        inp = BigraphRepresentation(
+            [
+            ],
+            [
+                BigraphAssignment(
+                    "Test1",
+                    IdBigraph()
+                ),
+            ]
+        )
+        assert BigraphValidator(inp).validate() == True
+
+    def test_invalid_bigraph(self):
+        inp = BigraphRepresentation(
+            [
+            ],
+            [
+                BigraphAssignment(
+                    "Test1",
+                    Bigraph()
+                ),
+            ]
+        )
+
+        with pytest.raises(ValueError):
+            assert BigraphValidator(inp).validate() == False
 
 class Test_Complex_Bigraph_Validation():
     def test_complex_valid(self):
