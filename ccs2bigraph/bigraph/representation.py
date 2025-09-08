@@ -12,6 +12,8 @@ This file provides classes for the individual parts of algebraic Bigraph terms, 
     - nesting
     - parallel product
     - merging
+
+TODO: Make sure renaming is only useful for composition and not for description
 """
 
 import logging
@@ -207,7 +209,7 @@ class ParallelBigraphs(Bigraph):
     parallel: list[Bigraph]
 
     def __str__(self) -> str:
-        return "(" + " | ".join(str(self.parallel)) + ")"
+        return "(" + " || ".join(map(str, self.parallel)) + ")"
 
 @dataclass(frozen=True)
 class BigraphAssignment(object):

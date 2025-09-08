@@ -1,63 +1,62 @@
 """CCS Grammar Tests"""
 
-import unittest
 import pyparsing as pp
 import pathlib
+
+import pytest
 
 import ccs2bigraph.ccs.grammar as g
 from ccs2bigraph.ccs.representation import *
 
-
-class Action_Test(unittest.TestCase):
+class Test_Action():
     def test_simple_action(self):
         inp = "a"
         exp = Action("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_dual_action(self):
         inp = "'a"
         exp = DualAction("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_long_action(self):
         inp = "areallylongactionname"
         exp = Action("areallylongactionname")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_action_with_whitespace(self):
         inp = "  a  "
         exp = Action("a")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_action_with_uppercase(self):
         inp = "aBcDe"
         exp = Action("aBcDe")
         act = g._action.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_invalid_action_name(self):
         inp = "Invalid"
 
-        with self.assertRaises(pp.exceptions.ParseException):
+        with pytest.raises(pp.exceptions.ParseException):
             g._action.parse_string(inp)  # type: ignore (testing private member)
 
-
-class Set_Test(unittest.TestCase):
+class Test_Set():
     def test_simple_set(self):
         inp = "{a}"
         exp = ActionSet([Action("a")])
         act = g._actionset.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_long_set(self):
         inp = "{a, b, c, d}"
         exp = ActionSet(list(map(Action, ["a", "b", "c", "d"])))
         act = g._actionset.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_set_assignment(self):
         inp = "set Test = {a, b, c, d};"
@@ -65,57 +64,56 @@ class Set_Test(unittest.TestCase):
             "Test", ActionSet(list(map(Action, ["a", "b", "c", "d"])))
         )
         act = g._actionset_assignment.parse_string(inp)[0]  # type: ignore (testing private member)
-        self.assertEqual(act, exp, f"{act} != {exp}")
+        assert exp == act
 
     def test_weirdly_named_actionset_exlam(self):
         inp = r"set A! = {a};"
         exp = Ccs([], [ActionSetAssignment("A!", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_hashpipe(self):
         inp = r"set A# = {a};"
         exp = Ccs([], [ActionSetAssignment("A#", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_prime(self):
         inp = r"set A' = {a};"
         exp = Ccs([], [ActionSetAssignment("A'", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_dash(self):
         inp = r"set A- = {a};"
         exp = Ccs([], [ActionSetAssignment("A-", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_qm(self):
         inp = r"set A? = {a};"
         exp = Ccs([], [ActionSetAssignment("A?", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_circumflex(self):
         inp = r"set A^ = {a};"
         exp = Ccs([], [ActionSetAssignment("A^", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_actionset_underscore(self):
         inp = r"set A_ = {a};"
         exp = Ccs([], [ActionSetAssignment("A_", ActionSet([Action("a")]))])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
-
-class Simple_Grammar_Test(unittest.TestCase):
+class Test_Simple_Grammar():
     def test_simple_process(self):
         inp = "A = 0;"
         exp = Ccs([ProcessAssignment("A", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_simple_prefixed_process(self):
         inp = "A = a.0;"
@@ -128,7 +126,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_dual_prefixed_process(self):
         inp = "A = 'a.0;"
@@ -144,7 +142,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_simple_alternative_process(self):
         inp = "A = a.0 + b.0;"
@@ -163,7 +161,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_dual_alternative_process(self):
         inp = "A = a.0 + 'b.0;"
@@ -184,7 +182,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_simple_parallel_process(self):
         inp = "A = a.0 | b.0;"
@@ -203,7 +201,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_dual_parallel_process(self):
         inp = "A = 'a.0 | b.0;"
@@ -224,7 +222,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_simple_hiding_process(self):
         inp = r"A = a.0 \ {a, b};"
@@ -243,7 +241,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_dual_hiding_process(self):
         inp = r"A = ('a.0) \ {a, b};"
@@ -262,7 +260,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_ref_hiding_process(self):
         inp = r"A = ('a.0) \ H;"
@@ -281,7 +279,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_simple_renaming_process(self):
         inp = r"A = a.0[b/a];"
@@ -300,7 +298,7 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_long_renaming_process(self):
         inp = r"A = (a.0)[b/a, d/c, f/e];"
@@ -321,52 +319,51 @@ class Simple_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_weirdly_named_process_exlam(self):
         inp = r"A! = 0;"
         exp = Ccs([ProcessAssignment("A!", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_hashpipe(self):
         inp = r"A# = 0;"
         exp = Ccs([ProcessAssignment("A#", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_prime(self):
         inp = r"A' = 0;"
         exp = Ccs([ProcessAssignment("A'", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_dash(self):
         inp = r"A- = 0;"
         exp = Ccs([ProcessAssignment("A-", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_qm(self):
         inp = r"A? = 0;"
         exp = Ccs([ProcessAssignment("A?", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_circumflex(self):
         inp = r"A^ = 0;"
         exp = Ccs([ProcessAssignment("A^", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
     
     def test_weirdly_named_process_underscore(self):
         inp = r"A_ = 0;"
         exp = Ccs([ProcessAssignment("A_", NilProcess())], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
-
-class Complex_Grammar_Test(unittest.TestCase):
+class Test_Complex_Grammar():
     def test_multi_prefix_alternative_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two;"
         exp = Ccs(
@@ -395,7 +392,7 @@ class Complex_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_multi_alternatives_process(self):
         inp = "Testcase = a.'b.One + 'a.b.Two + a.b.Three + 'a.'b.Four;"
@@ -438,7 +435,7 @@ class Complex_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_alternatives_renaming_process(self):
         inp = "Testcase = (a.'b.One)[x/y] + 'a.b.Two[x/y];"
@@ -475,7 +472,7 @@ class Complex_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_complex_processA(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y];"
@@ -499,7 +496,7 @@ class Complex_Grammar_Test(unittest.TestCase):
         )
 
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_complex_processB(self):
         inp = "TestcaseComplex1 = A[x/y] + B[x/y] \\ L;"
@@ -527,7 +524,7 @@ class Complex_Grammar_Test(unittest.TestCase):
         )
 
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_complex_processC(self):
         inp = "TestcaseComplex1 = (A)[x/y] + (B[x/y]) \\ L | 0;"
@@ -560,7 +557,7 @@ class Complex_Grammar_Test(unittest.TestCase):
         )
 
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     # @unittest.skip("too slow.")
     def test_complex_processD(self):
@@ -616,7 +613,7 @@ class Complex_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     # @unittest.skip("too slow.")
     def test_complex_processE(self):
@@ -703,9 +700,9 @@ class Complex_Grammar_Test(unittest.TestCase):
             [],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
-class Ccs_Input_Grammar_Test(unittest.TestCase):
+class Test_Ccs_Input_Grammar():
     def test_simple_ccs(self):
         inp = """
             A = a.0;
@@ -722,7 +719,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
             ],
         )
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_basic_buffer(self):
         inputdir = pathlib.Path(__file__).parent
@@ -822,7 +819,7 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
             ),
         ], [])
         act = g.parse(inp)
-        self.assertEqual(exp, act)
+        assert exp == act
 
     def test_dekker(self):
         inputdir = pathlib.Path(__file__).parent
@@ -1148,7 +1145,4 @@ class Ccs_Input_Grammar_Test(unittest.TestCase):
         )
 
         act = g.parse(inp)
-        self.assertEqual(exp, act)
-
-if __name__ == "__main__":
-    unittest.main()
+        assert exp == act

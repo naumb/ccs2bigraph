@@ -58,7 +58,7 @@ class ActionSet(object):
     """
     Represents a set of `Action`s, used for instance in `HidingProcess`.
 
-    :param set[Action] actions: The set of actions in the `ActionSet`
+    :param list[Action] actions: The set of actions in the `ActionSet`
     
     Example:
     >>> str(ActionSet([Action("a")]))
