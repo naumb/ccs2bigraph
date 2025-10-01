@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 import pyparsing as pp
 import typing as tp
 
-from .representation import Action, ActionSet, ActionSetAssignment, AlternativeProcesses, CcsRepresentation, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
+from .representation import Action, ActionSet, ActionSetAssignment, SumProcesses, CcsRepresentation, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
 
 # Performance
 pp.ParserElement.enable_packrat()
@@ -80,7 +80,7 @@ def _actionset_assignment_parse_action(pr: pp.ParseResults) -> ActionSetAssignme
 _actionset_assignment.setParseAction(_actionset_assignment_parse_action)
 
 # processes
-# we do need a notion of processes already, however they aren't (fully) defined yet.
+# we do need a notion of processes already at this point, however they aren't (fully) defined yet.
 _process_name = pp.Word(pp.alphas.upper(), pp.alphanums + "!#'-?^_")
 
 def _process_name_parse_action(pr: pp.ParseResults) -> ProcessByName:
@@ -134,8 +134,8 @@ def _prefixed_parse_action(pr: pp.ParseResults) -> PrefixedProcess:
 def _parallel_parse_action(pr: pp.ParseResults) -> ParallelProcesses:
     return ParallelProcesses(tp.cast(list[Process], pr.as_list()[0])) # pyright: ignore[reportUnknownMemberType]
 
-def _alternative_parse_action(pr: pp.ParseResults) -> AlternativeProcesses:
-    return AlternativeProcesses(tp.cast(list[Process], pr.as_list()[0])) # pyright: ignore[reportUnknownMemberType]
+def _alternative_parse_action(pr: pp.ParseResults) -> SumProcesses:
+    return SumProcesses(tp.cast(list[Process], pr.as_list()[0])) # pyright: ignore[reportUnknownMemberType]
 
 # overall process definition including operators
 _process = pp.infix_notation(

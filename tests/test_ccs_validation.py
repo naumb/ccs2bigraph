@@ -32,12 +32,12 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
         inp = RenamingProcess(ProcessByName("A"), [(Action("new"), Action("old"))])
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
-    def test_alternative_processes_failed_validation(self):
-        inp = AlternativeProcesses([NilProcess(), ProcessByName("A")])
+    def test_sum_processes_failed_validation(self):
+        inp = SumProcesses([NilProcess(), ProcessByName("A")])
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
 
-    def test_alternative_processes_successful_validation(self):
-        inp = AlternativeProcesses([PrefixedProcess(Action("x"), NilProcess()), PrefixedProcess(DualAction("x"), NilProcess())])
+    def test_sum_processes_successful_validation(self):
+        inp = SumProcesses([PrefixedProcess(Action("x"), NilProcess()), PrefixedProcess(DualAction("x"), NilProcess())])
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_parallel_processes_validation(self):
@@ -46,8 +46,8 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
 
 
 class Test_Complex_Bigraph_Validation():
-    def test_alternative_validation(self):
-        inp = AlternativeProcesses(
+    def test_sum_validation(self):
+        inp = SumProcesses(
             [
                 PrefixedProcess(
                     Action("a"),
@@ -69,7 +69,7 @@ class Test_Complex_Bigraph_Validation():
     def test_complex_process_A_failed_validation(self):
         inp = ParallelProcesses(
             [
-                AlternativeProcesses(
+                SumProcesses(
                     [
                         RenamingProcess( # Failure will occur here
                             PrefixedProcess(
@@ -98,7 +98,7 @@ class Test_Complex_Bigraph_Validation():
                 ),
                 HidingProcess(
                     RenamingProcess(
-                        AlternativeProcesses(
+                        SumProcesses(
                             [
                                 PrefixedProcess(
                                     Action("x"),
@@ -145,7 +145,7 @@ class Test_Complex_Bigraph_Validation():
     def test_complex_process_A_successful_validation(self):
         inp = ParallelProcesses(
             [
-                AlternativeProcesses(
+                SumProcesses(
                     [
                         PrefixedProcess(
                             Action("a"),
@@ -174,7 +174,7 @@ class Test_Complex_Bigraph_Validation():
                 ),
                 HidingProcess(
                     RenamingProcess(
-                        AlternativeProcesses(
+                        SumProcesses(
                             [
                                 PrefixedProcess(
                                     Action("x"),

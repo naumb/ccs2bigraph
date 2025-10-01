@@ -150,7 +150,7 @@ class Test_Simple_Grammar():
             [
                 ProcessAssignment(
                     "A",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(Action("a"), NilProcess()),
                             PrefixedProcess(Action("b"), NilProcess()),
@@ -169,7 +169,7 @@ class Test_Simple_Grammar():
             [
                 ProcessAssignment(
                     "A",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(Action("a"), NilProcess()),
                             PrefixedProcess(
@@ -370,7 +370,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "Testcase",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("a"),
@@ -400,7 +400,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "Testcase",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("a"),
@@ -443,7 +443,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "Testcase",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             RenamingProcess(
                                 PrefixedProcess(
@@ -480,7 +480,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             RenamingProcess(
                                 ProcessByName("A"), [(Action("x"), Action("y"))]
@@ -504,7 +504,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             RenamingProcess(
                                 ProcessByName("A"), [(Action("x"), Action("y"))]
@@ -532,7 +532,7 @@ class Test_Complex_Grammar():
             [
                 ProcessAssignment(
                     "TestcaseComplex1",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             RenamingProcess(
                                 ProcessByName("A"), [(Action("x"), Action("y"))]
@@ -570,7 +570,7 @@ class Test_Complex_Grammar():
                     "Testcase",
                     HidingProcess(
                         RenamingProcess(
-                            AlternativeProcesses(
+                            SumProcesses(
                                 [
                                     PrefixedProcess(
                                         Action("x"),
@@ -624,7 +624,7 @@ class Test_Complex_Grammar():
                     "Testcase",
                     ParallelProcesses(
                         [
-                            AlternativeProcesses(
+                            SumProcesses(
                                 [
                                     RenamingProcess(
                                         PrefixedProcess(
@@ -653,7 +653,7 @@ class Test_Complex_Grammar():
                             ),
                             HidingProcess(
                                 RenamingProcess(
-                                    AlternativeProcesses(
+                                    SumProcesses(
                                         [
                                             PrefixedProcess(
                                                 Action("x"),
@@ -786,7 +786,7 @@ class Test_Ccs_Input_Grammar():
             ),
             ProcessAssignment(
                 "Spec'",
-                AlternativeProcesses(
+                SumProcesses(
                     [
                         PrefixedProcess(
                             DualAction("b"),
@@ -801,7 +801,7 @@ class Test_Ccs_Input_Grammar():
             ),
             ProcessAssignment(
                 "Spec''",
-                AlternativeProcesses(
+                SumProcesses(
                     [
                         PrefixedProcess(
                             DualAction("b"),
@@ -831,7 +831,7 @@ class Test_Ccs_Input_Grammar():
             [
                 ProcessAssignment(
                     "B1f",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("b1rf"),
@@ -850,7 +850,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "B1t",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("b1rt"),
@@ -869,7 +869,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "B2f",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("b2rf"),
@@ -888,7 +888,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "B2t",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("b2rt"),
@@ -907,7 +907,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "K1",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("kr1"),
@@ -926,7 +926,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "K2",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 DualAction("kr2"),
@@ -952,7 +952,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P11",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("b2rf"),
@@ -967,7 +967,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P12",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("kr1"),
@@ -985,7 +985,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P13",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("kr2"),
@@ -1026,7 +1026,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P21",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("b1rf"),
@@ -1041,7 +1041,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P22",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("kr2"),
@@ -1059,7 +1059,7 @@ class Test_Ccs_Input_Grammar():
                 ),
                 ProcessAssignment(
                     "P23",
-                    AlternativeProcesses(
+                    SumProcesses(
                         [
                             PrefixedProcess(
                                 Action("kr1"),

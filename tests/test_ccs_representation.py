@@ -67,8 +67,8 @@ class Test_Processes():
         act = str(inp)
         assert exp == act
 
-    def test_alternative_processes(self):
-        inp = AlternativeProcesses([NilProcess(), ProcessByName("A")])
+    def test_sum_processes(self):
+        inp = SumProcesses([NilProcess(), ProcessByName("A")])
         exp = r"(0 + A)"
         act = str(inp)
         assert exp == act

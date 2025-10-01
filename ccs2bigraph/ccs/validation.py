@@ -1,3 +1,5 @@
+#type: ignore
+
 """
 Validation of CCS Processes
 """
@@ -30,8 +32,8 @@ class FinitePureCcsValidatior(object):
             :return bool: Whether or not it is valid
             """
             match p:
-                case AlternativeProcesses(alternatives=alts):
-                    return all([(isinstance(a, PrefixedProcess) and _traverse_helper(a)) for a in alts])
+                case SumProcesses(sums=sums):
+                    return all([(isinstance(s, PrefixedProcess) and _traverse_helper(s)) for s in sums])
                 case NilProcess(): return True
                 case ProcessByName(): return True #TODO: is this correct?
                 case PrefixedProcess(prefix=_, remaining=p): return _traverse_helper(p)

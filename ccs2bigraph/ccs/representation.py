@@ -197,20 +197,35 @@ class RenamingProcess(Process):
         return f"({self.process}[" + ", ".join(f"{new}/{old}" for (new, old) in self.renaming) + "])"
 
 @dataclass(frozen=True)
-class AlternativeProcesses(Process):
+class SumProcesses(Process):
     """
     Process representing the result of one (or more consequtive) alternative operations
 
-    :param list[Process] alternatives: The alternative processes
+    :param list[Process] sums: The alternative processes
 
     Example:
-    >>> str(AlternativeProcesses([PrefixedProcess(Action('a'), NilProcess()), PrefixedProcess(Action('b'), NilProcess()), PrefixedProcess(Action('c'), NilProcess())]))
+    >>> str(SumProcesses([PrefixedProcess(Action('a'), NilProcess()), PrefixedProcess(Action('b'), NilProcess()), PrefixedProcess(Action('c'), NilProcess())]))
     '((a.0) + (b.0) + (c.0))'
     """
-    alternatives: list[Process]
+    sums: list[Process]
     
     def __str__(self) -> str:
-        return "(" + " + ".join(map(str, self.alternatives)) + ")"
+        return "(" + " + ".join(map(str, self.sums)) + ")"
+    
+@dataclass(frozen=True)
+class AlternativeProcess(Process):
+    """
+    Process representing an Alternative
+    
+    Alternatives are merely only a wrapper for processes, TODO Why? 
+
+    :param Process p: The processes
+
+    """
+    p: Process
+    
+    def __str__(self) -> str:
+        return f"{self.p}"
 
 @dataclass(frozen=True)
 class ParallelProcesses(Process):
