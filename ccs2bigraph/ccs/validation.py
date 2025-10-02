@@ -1,5 +1,3 @@
-#type: ignore
-
 """
 Validation of CCS Processes
 """
@@ -42,4 +40,4 @@ class FinitePureCcsValidatior(object):
                 case ParallelProcesses(parallels=ps): return all(_traverse_helper(p) for p in ps)
                 case Process(): return False # This should not occur.
 
-        return all(_traverse_helper(p) for p in [pa.process for pa in ccs.processes])
+        return all(_traverse_helper(p) for p in [pa.process for pa in ccs.process_assignments])

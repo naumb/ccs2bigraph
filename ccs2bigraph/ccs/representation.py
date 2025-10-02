@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 from abc import ABC
 from dataclasses import dataclass
+from typing import Self
 
-@dataclass(frozen=True)
+@dataclass()
 class Action(object):
     """
     Represents Actions of CCS Terms
@@ -35,7 +36,7 @@ class Action(object):
     def __str__(self) -> str:
         return f"{self.name}"
     
-@dataclass(frozen=True)
+@dataclass()
 class DualAction(Action):
     """
     Represents Dual Actions of CCS Terms
@@ -53,7 +54,7 @@ class DualAction(Action):
     def __str__(self) -> str:
         return f"'{self.name}"
 
-@dataclass(frozen=True)
+@dataclass()
 class ActionSet(object):
     """
     Represents a set of `Action`s, used for instance in `HidingProcess`.
@@ -69,7 +70,7 @@ class ActionSet(object):
     def __str__(self) -> str:
         return "{" + ", ".join(map(str, self.actions)) + "}"
     
-@dataclass(frozen=True)
+@dataclass()
 class ActionSetByName(object):
     """
     Refers to an `ActionSetAssignment` by its name.
@@ -85,7 +86,7 @@ class ActionSetByName(object):
     def __str__(self) -> str:
         return self.name
 
-@dataclass(frozen=True)
+@dataclass()
 class ActionSetAssignment(object):
     """
     Assignment of an `ActionSet` to a name.
@@ -106,10 +107,14 @@ class ActionSetAssignment(object):
 class Process(ABC):
     """
     Abstract Base Class for CCS process definitions
-    """
-    pass
 
-@dataclass(frozen=True)
+    :param Self | None parent: The parent process of each parent expression. For example, the :class:`NilProcess` in `a.0` has the `PrefixedProcess(Action("a"), NilProcess)` as its parent.  
+    """
+
+    def __init__(self, *, parent: Self | None = None):
+        self.parent = parent
+
+@dataclass()
 class NilProcess(Process):
     """
     The empty process.
@@ -119,10 +124,13 @@ class NilProcess(Process):
     '0'
     """
 
+    def __post_init__(self):
+        super().__init__()
+
     def __str__(self):
         return "0"
     
-@dataclass(frozen=True)
+@dataclass()
 class ProcessByName(Process):
     """
     Refers to an `ProcessAssignment` by its name.
@@ -134,11 +142,14 @@ class ProcessByName(Process):
     'A'
     """
     name: str
+
+    def __post_init__(self):
+        super().__init__()
     
     def __str__(self):
         return self.name
 
-@dataclass(frozen=True)
+@dataclass()
 class PrefixedProcess(Process):
     """
     Process representing the result of a prefix operation.
@@ -154,11 +165,14 @@ class PrefixedProcess(Process):
     """
     prefix: Action
     remaining: Process
+
+    def __post_init__(self):
+        super().__init__()
     
     def __str__(self) -> str:
         return f"({self.prefix}.{self.remaining})"
 
-@dataclass(frozen=True)
+@dataclass()
 class HidingProcess(Process):
     """
     Process representing the result of a hiding operation
@@ -174,11 +188,14 @@ class HidingProcess(Process):
     """
     process: Process
     hiding: ActionSet | ActionSetByName
+
+    def __post_init__(self):
+        super().__init__()
     
     def __str__(self) -> str:
         return f"({self.process} \\ {self.hiding})"
 
-@dataclass(frozen=True)
+@dataclass()
 class RenamingProcess(Process):
     """
     Process representing the result of a renaming operation
@@ -193,10 +210,13 @@ class RenamingProcess(Process):
     process: Process
     renaming: list[tuple[Action, Action]]
 
+    def __post_init__(self):
+        super().__init__()
+
     def __str__(self) -> str:
         return f"({self.process}[" + ", ".join(f"{new}/{old}" for (new, old) in self.renaming) + "])"
 
-@dataclass(frozen=True)
+@dataclass()
 class SumProcesses(Process):
     """
     Process representing the result of one (or more consequtive) alternative operations
@@ -208,26 +228,14 @@ class SumProcesses(Process):
     '((a.0) + (b.0) + (c.0))'
     """
     sums: list[Process]
+
+    def __post_init__(self):
+        super().__init__()
     
     def __str__(self) -> str:
         return "(" + " + ".join(map(str, self.sums)) + ")"
-    
-@dataclass(frozen=True)
-class AlternativeProcess(Process):
-    """
-    Process representing an Alternative
-    
-    Alternatives are merely only a wrapper for processes, TODO Why? 
 
-    :param Process p: The processes
-
-    """
-    p: Process
-    
-    def __str__(self) -> str:
-        return f"{self.p}"
-
-@dataclass(frozen=True)
+@dataclass()
 class ParallelProcesses(Process):
     """
     Process representing the result of one (or more consequtive) parallel composition operations
@@ -239,11 +247,14 @@ class ParallelProcesses(Process):
     '((a.0) | (b.0) | (c.0))'
     """
     parallels: list[Process]
+
+    def __post_init__(self):
+        super().__init__()
     
     def __str__(self) -> str:
         return "(" + " | ".join(map(str, self.parallels)) + ")"
     
-@dataclass(frozen=True)
+@dataclass()
 class ProcessAssignment:
     """
     Assignment of a `Process` to a name.
@@ -263,7 +274,7 @@ class ProcessAssignment:
     def __str__(self) -> str:
         return f"{self.name} = {self.process};"
     
-@dataclass(frozen=True)
+@dataclass()
 class CcsRepresentation:
     """
     Representation a closed CCS expression.
@@ -271,5 +282,5 @@ class CcsRepresentation:
     :param list[ProcessAssignment] processes: The defined processes in the CCS expression
     :param list[ActionSetAssignment] action_sets: The defined action sets in the CCS expression
     """
-    processes: list[ProcessAssignment]
-    action_sets: list[ActionSetAssignment]
+    process_assignments: list[ProcessAssignment]
+    action_set_assignments: list[ActionSetAssignment]
