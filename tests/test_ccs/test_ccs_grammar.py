@@ -722,7 +722,7 @@ class Test_Ccs_Input_Grammar():
         assert exp == act
 
     def test_basic_buffer(self):
-        inputdir = pathlib.Path(__file__).parent
+        inputdir = pathlib.Path(__file__).parent.parent
 
         with open(inputdir / "res" / "basic_buffer.ccs") as f:
             inp = f.read()
@@ -822,7 +822,7 @@ class Test_Ccs_Input_Grammar():
         assert exp == act
 
     def test_dekker(self):
-        inputdir = pathlib.Path(__file__).parent
+        inputdir = pathlib.Path(__file__).parent.parent
 
         with open(inputdir / "res" / "dekker.ccs") as f:
             inp = f.read()
