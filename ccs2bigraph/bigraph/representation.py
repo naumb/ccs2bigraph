@@ -229,7 +229,7 @@ class BigraphAssignment(object):
         return f"big {self.name} = {self.bigraph};"
 
 @dataclass(frozen=True)
-class BigraphByName(object):
+class BigraphByName(Bigraph):
     """
     Refers to an :class:`BigraphAssignment` by its name.
 
