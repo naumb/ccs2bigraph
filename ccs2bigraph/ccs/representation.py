@@ -279,8 +279,8 @@ class CcsRepresentation:
     """
     Representation a closed CCS expression.
 
-    :param list[ProcessAssignment] processes: The defined processes in the CCS expression
-    :param list[ActionSetAssignment] action_sets: The defined action sets in the CCS expression
+    :param list[ProcessAssignment] process_assignments: The defined processes in the CCS expression
+    :param list[ActionSetAssignment] action_set_assignments: The defined action sets in the CCS expression
     """
     process_assignments: list[ProcessAssignment]
     action_set_assignments: list[ActionSetAssignment]
