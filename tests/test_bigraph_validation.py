@@ -27,7 +27,8 @@ class Test_Simple_Bigraph_Validation():
                         list(map(Link, ["a", "b", "c"]))
                     )
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == True
 
@@ -52,7 +53,8 @@ class Test_Simple_Bigraph_Validation():
                         [Link("a")]
                     )
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == False
 
@@ -69,7 +71,8 @@ class Test_Simple_Bigraph_Validation():
                         list(map(Link, ["a", "b", "c"]))
                     )
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == False
 
@@ -86,7 +89,8 @@ class Test_Simple_Bigraph_Validation():
                         list(map(Link, ["a", "b"]))
                     )
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == False
 
@@ -103,7 +107,8 @@ class Test_Simple_Bigraph_Validation():
                         list(map(Link, ["a", "b", "c", "d"]))
                     )
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == False
 
@@ -116,7 +121,8 @@ class Test_Simple_Bigraph_Validation():
                     "Test1",
                     IdBigraph()
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
         assert BigraphValidator(inp).validate() == True
 
@@ -129,7 +135,8 @@ class Test_Simple_Bigraph_Validation():
                     "Test1",
                     Bigraph()
                 ),
-            ]
+            ],
+            BigraphByName("Test1")
         )
 
         with pytest.raises(ValueError):
@@ -194,6 +201,7 @@ class Test_Complex_Bigraph_Validation():
                         )
                     )
                 )
-            ]
+            ],
+            BigraphByName("Test")
         )
         assert BigraphValidator(inp).validate() == True

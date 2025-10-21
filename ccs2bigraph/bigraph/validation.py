@@ -18,7 +18,7 @@ class BigraphValidator:
     :param BigraphRepresentation content: The Bigraph representation to verify
 
     Example:
-    >>> BigraphValidator(BigraphRepresentation([ControlDefinition(AtomicControl("M", 1))], [BigraphAssignment("Test", NestingBigraph(ControlBigraph(ControlByName("M"),[Link("x")]),OneBigraph()))])).validate()
+    >>> BigraphValidator(BigraphRepresentation([ControlDefinition(AtomicControl("M", 1))], [BigraphAssignment("Test", NestingBigraph(ControlBigraph(ControlByName("M"),[Link("x")]),OneBigraph()))],BigraphByName("Test"))).validate()
     True
     """
     content: BigraphRepresentation

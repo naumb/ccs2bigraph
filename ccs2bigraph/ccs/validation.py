@@ -34,7 +34,7 @@ class FinitePureCcsValidatior(object):
                     return all([(isinstance(s, PrefixedProcess) and _traverse_helper(s)) for s in sums])
                 case NilProcess(): return True
                 case ProcessByName(): return True #TODO: is this correct?
-                case PrefixedProcess(prefix=_, remaining=p): return _traverse_helper(p)
+                case PrefixedProcess(prefix=_, remaining=p): return isinstance(p.parent, SumProcesses) and _traverse_helper(p)
                 case HidingProcess(process=p, hiding=_): return _traverse_helper(p)
                 case RenamingProcess(process=p, renaming=_): return _traverse_helper(p)
                 case ParallelProcesses(parallels=ps): return all(_traverse_helper(p) for p in ps)

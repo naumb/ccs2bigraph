@@ -356,6 +356,7 @@ class Test_Ccs_Bigraph():
 
         exp = "\n".join([
             self._CCS_CONTROLS_RESULT,
+            "\n", # No bigraphs, so just the empty line
             self._CCS_REACTION_RESULT,
             self._CCS_BRS_RESULT("Bogus")
         ])
