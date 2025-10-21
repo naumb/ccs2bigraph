@@ -1,5 +1,5 @@
 """
-Translation of a CCS Representation to a Bigraph representation
+Translation of a CCS representation to a Bigraph representation
 """
 
 from .ccs import representation as ccs
@@ -14,12 +14,17 @@ class FiniteCcsTranslator(object):
         self._ccs = ccs
         self._big = None
 
-    def _generate_ccs_reaction_rules(self) -> None:
+    def _generate_ccs_controls(self) -> list[big.ControlDefinition]:
         """
-        Includes the CCS transition semantics as reaction rules in Bigraphs
+        Includes the Bigraph Controls for CCS
         """
 
-        pass
+        return [
+            big.ControlDefinition(big.AtomicControl("Nil", 0)),
+            big.ControlDefinition(big.Control("Alt", 0)),
+            big.ControlDefinition(big.Control("Send", 1)),
+            big.ControlDefinition(big.Control("Get", 1)),
+        ]
 
     def _generate_bigraph_content(self) -> None:
         """

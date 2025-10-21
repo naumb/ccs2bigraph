@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 from abc import ABC
 from dataclasses import dataclass
 
+from textwrap import dedent, indent
+
 @dataclass(frozen=True)
 class Control(object):
     """
@@ -243,14 +245,48 @@ class BigraphByName(object):
         return self.name
     
 @dataclass(frozen=True)
+class BigraphReaction(object):
+    """
+    Defines the reaction rules
+
+    :param str rules: The reaction rules. For now, they are defined as a string since they are constant for CCS.
+    """
+    name: str = "ccs_react"
+    rule: str = dedent("""\
+        (Alt.(Send{a}.id | id)) | (Alt.(Get{a}.id | id))
+        ->
+        {a} | id | id
+        @[0, 2];
+    """)
+    
+    def __str__(self):
+        return f"react {self.name} = \n" + indent(self.rule, '    ')
+    
+@dataclass(frozen=True)
 class BigraphRepresentation(object):
     """
     Refers to a complete representation of a Bigraphical System.
 
     :param list[ControlDefinition] controls: List of the controls used in this representation
     :param list[BigraphAssignment] bigraphs: List of defined bigraphs in this representation
+    :param BigraphByName init_bigraph: Bigraph used as initialization in the generated Bigraphical Reaction System
     """
 
     controls: list[ControlDefinition]
     bigraphs: list[BigraphAssignment]
+    init_bigraph: BigraphByName
+    reaction: BigraphReaction = BigraphReaction() 
 
+
+    def __str__(self):
+        controls_str = "\n".join(map(str, self.controls)) + "\n"
+        bigraphs_str = "\n".join(map(str, self.bigraphs)) + "\n"
+        reaction_str = str(self.reaction)
+        brs_str = dedent(f"""\
+            begin brs
+                init {self.init_bigraph};
+                rules = [{{{self.reaction.name}}}];
+            end
+        """)
+
+        return "\n".join([controls_str, bigraphs_str, reaction_str, brs_str])
