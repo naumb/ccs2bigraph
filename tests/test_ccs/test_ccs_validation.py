@@ -1,5 +1,6 @@
 """Bigraph Validation Tests"""
 
+from ccs2bigraph.ccs.augmentation import CcsAugmentator
 from ccs2bigraph.ccs.validation import *
 from ccs2bigraph.ccs.representation import *
 
@@ -15,9 +16,14 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
     def test_process_by_name_validation(self):
         assert FinitePureCcsValidatior.validate(helper_wrap_process(ProcessByName("Test"))) == True
 
-
     def test_prefixed_process_validation(self):
         inp = PrefixedProcess(Action("a"), NilProcess())
+        assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
+
+    def test_wrapped_prefixed_process_validation(self):
+        inp = SumProcesses([PrefixedProcess(Action("a"), NilProcess())])
+        inp.sums[0].parent = inp
+
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_hiding_process_actionset_validation(self):
@@ -37,7 +43,12 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
 
     def test_sum_processes_successful_validation(self):
-        inp = SumProcesses([PrefixedProcess(Action("x"), NilProcess()), PrefixedProcess(DualAction("x"), NilProcess())])
+        inp = (SumProcesses([PrefixedProcess(Action("x"), NilProcess()), PrefixedProcess(DualAction("x"), NilProcess())]))
+        
+        # reconstruct parent relationship
+        for s in inp.sums:
+            s.parent = inp
+        
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_parallel_processes_validation(self):
@@ -51,19 +62,27 @@ class Test_Complex_Bigraph_Validation():
             [
                 PrefixedProcess(
                     Action("a"),
-                    PrefixedProcess(
-                        DualAction("b"),
-                        ProcessByName("One"),
-                    ),
+                    SumProcesses([
+                        PrefixedProcess(
+                            DualAction("b"),
+                            ProcessByName("One"),
+                        ),
+                    ]),
                 ),
                 PrefixedProcess(
                     DualAction("a"),
-                    PrefixedProcess(
-                        Action("b"), ProcessByName("Two")
-                    ),
-                ),
+                    SumProcesses([
+                        PrefixedProcess(
+                            Action("b"), 
+                            ProcessByName("Two"),
+                        ),
+                    ]),
+                )
             ]
         )
+
+        inp = CcsAugmentator.augment(inp)
+
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_complex_process_A_failed_validation(self):
@@ -219,4 +238,8 @@ class Test_Complex_Bigraph_Validation():
                 ),
             ]
         )
+
+        # Use Augmentation here, even if this is a bit fuzzy
+        inp = CcsAugmentator.augment(inp)
+
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
