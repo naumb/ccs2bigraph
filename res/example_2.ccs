@@ -1,0 +1,5 @@
+* This is a very(!) simple example file.
+* This (roughly) should be the result
+* big A = Alt.(Send{x}.({x} | {y} | {z} | Nil) | Get{z}.Alt.Get{y}.Alt.Send{z}.({x} | {y} | {z} | Nil)) | Alt.(Get{x}.({x} | {y} | {z} | Nil));
+
+Proc = (a.'b.0) | ('a.b.0);
