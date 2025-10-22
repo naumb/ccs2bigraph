@@ -92,7 +92,8 @@ class FiniteCcsTranslator(object):
             raise ValueError("Invalid Processes. TODO: Which?")
 
         result = [
-            big.BigraphAssignment(pa.name, _translation_helper(pa.process)) 
+            # Keep in mind: Bigraph identifiers must be lowercase names
+            big.BigraphAssignment(pa.name.lower(), _translation_helper(pa.process)) 
             for pa in self._ccs.process_assignments
         ]
 
@@ -105,6 +106,6 @@ class FiniteCcsTranslator(object):
         return big.BigraphRepresentation(
             self._generate_ccs_controls(),
             self._generate_bigraph_content(),
-            big.BigraphByName(init_process),
+            big.BigraphByName(init_process.lower()),
             big.BigraphReaction()
         )
