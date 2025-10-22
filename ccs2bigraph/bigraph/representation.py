@@ -285,23 +285,24 @@ class BigraphRepresentation(object):
     :param list[ControlDefinition] controls: List of the controls used in this representation
     :param list[BigraphAssignment] bigraphs: List of defined bigraphs in this representation
     :param BigraphByName init_bigraph: Bigraph used as initialization in the generated Bigraphical Reaction System
+    :param list[BigraphReaction] reactions: List of reaction rules
     """
 
     controls: list[ControlDefinition]
     bigraphs: list[BigraphAssignment]
     init_bigraph: BigraphByName
-    reaction: BigraphReaction = BigraphReaction() 
-
+    reactions: list[BigraphReaction]
 
     def __str__(self):
         controls_str = "\n".join(map(str, self.controls)) + "\n"
         bigraphs_str = "\n".join(map(str, self.bigraphs)) + "\n"
-        reaction_str = str(self.reaction)
+        reactions_str = "\n".join(map(str, self.reactions))
+        reactions_names_str = ", ".join([r.name for r in self.reactions])
         brs_str = dedent(f"""\
             begin brs
                 init {self.init_bigraph};
-                rules = [{{{self.reaction.name}}}];
+                rules = [{{{reactions_names_str}}}];
             end
         """)
 
-        return "\n".join([controls_str, bigraphs_str, reaction_str, brs_str])
+        return "\n".join([controls_str, bigraphs_str, reactions_str, brs_str])

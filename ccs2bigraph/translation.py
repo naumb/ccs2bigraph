@@ -3,6 +3,7 @@ Translation of a CCS representation to a Bigraph representation
 """
 
 from functools import reduce
+from textwrap import dedent
 from .ccs import representation as ccs
 from .ccs.validation import FinitePureCcsValidatior 
 from .ccs.augmentation import CcsAugmentator
@@ -22,10 +23,45 @@ class FiniteCcsTranslator(object):
         """
 
         return [
+            big.ControlDefinition(big.Control("Ccs", 0)),
             big.ControlDefinition(big.AtomicControl("Nil", 0)),
             big.ControlDefinition(big.Control("Alt", 0)),
             big.ControlDefinition(big.Control("Send", 1)),
             big.ControlDefinition(big.Control("Get", 1)),
+        ]
+    
+    def _generate_bigraph_reactions(self) -> list[big.BigraphReaction]:
+        """
+        Includes the Bigraph Reaction rules for CCS
+        """
+        return [
+            big.BigraphReaction(
+                "ccs_react",
+                dedent("""\
+                    Ccs.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
+                    ->
+                    Ccs.({action} | id | id)
+                    @[0, 2];
+                """)
+            ),
+            big.BigraphReaction(
+                "ccs_send",
+                dedent("""\
+                    Ccs.((Alt.(Send{action}.id | id)) | id)
+                    ->
+                    Ccs.({action} | id | id)
+                    @[0, 2];
+                """)
+            ),
+            big.BigraphReaction(
+                "ccs_get",
+                dedent("""\
+                    Ccs.((Alt.(Get{action}.id | id)) | id)
+                    ->
+                    Ccs.({action} | id | id)
+                    @[0, 2];
+                """)
+            ),
         ]
 
     def _generate_bigraph_content(self) -> list[big.BigraphAssignment]:
@@ -107,5 +143,5 @@ class FiniteCcsTranslator(object):
             self._generate_ccs_controls(),
             self._generate_bigraph_content(),
             big.BigraphByName(init_process.lower()),
-            big.BigraphReaction()
+            self._generate_bigraph_reactions(),
         )
