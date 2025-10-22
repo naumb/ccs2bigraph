@@ -19,7 +19,7 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Self
 
-@dataclass()
+@dataclass(frozen=True)
 class Action(object):
     """
     Represents Actions of CCS Terms
@@ -36,7 +36,7 @@ class Action(object):
     def __str__(self) -> str:
         return f"{self.name}"
     
-@dataclass()
+@dataclass(frozen=True)
 class DualAction(Action):
     """
     Represents Dual Actions of CCS Terms
@@ -284,3 +284,37 @@ class CcsRepresentation:
     """
     process_assignments: list[ProcessAssignment]
     action_set_assignments: list[ActionSetAssignment]
+
+    def get_all_actions(self) -> set[Action]:
+        """
+        Collects all actions present in the given CCS Representation. This includes all actions used in the processes in their non-dual form as well as all actions present in any defined action set
+        """
+        actions: set[Action] = set()
+        
+        # Gather actions from action set assignments
+        for asa in self.action_set_assignments:
+            actions.union(set(asa.actionSet.actions))
+
+        # Gather actions from process assignments
+        def _gather_helper(p: Process) -> set[Action]:
+            match p:
+                case NilProcess() | ProcessByName(): return set()
+                case PrefixedProcess(prefix=prefix, remaining=remaining):
+                    # Construct new (non-dual) action with the same name
+                    return _gather_helper(remaining).union(set([Action(prefix.name)]))
+                case HidingProcess(process=process, hiding=hiding):
+                    if isinstance(hiding, ActionSet): return _gather_helper(process).union(set(hiding.actions))
+                    else: return _gather_helper(process)
+                case RenamingProcess(process=process, renaming=renaming):
+                    return _gather_helper(process).union(
+                        # Again, construct new (non-dual) actions with the same name
+                        set([Action(new_action.name) for _, new_action in renaming])
+                    )
+                case SumProcesses(sums=processes) | ParallelProcesses(parallels=processes):
+                    return set[Action].union(*map(_gather_helper, processes))
+                case Process(): raise TypeError(f"{p} may not be an abstract process.")
+
+        for pa in self.process_assignments:
+            actions = actions.union(_gather_helper(pa.process))
+
+        return actions
