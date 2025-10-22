@@ -8,7 +8,8 @@
             "name": "Python Debugger: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "ccs2bigraph"
+            "module": "ccs2bigraph",
+            "args": ["res/example.ccs", "A"]
         }
     ]
 }
