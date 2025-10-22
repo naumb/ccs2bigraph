@@ -66,13 +66,13 @@ class Test_Set():
         act = g._actionset_assignment.parse_string(inp)[0]  # type: ignore (testing private member)
         assert exp == act
 
-    def test_weirdly_named_actionset_exlam(self):
+    def test_weirdly_named_actionset_bang(self):
         inp = r"set A! = {a};"
         exp = CcsRepresentation([], [ActionSetAssignment("A!", ActionSet([Action("a")]))])
         act = g.parse(inp)
         assert exp == act
     
-    def test_weirdly_named_actionset_hashpipe(self):
+    def test_weirdly_named_actionset_hash(self):
         inp = r"set A# = {a};"
         exp = CcsRepresentation([], [ActionSetAssignment("A#", ActionSet([Action("a")]))])
         act = g.parse(inp)
@@ -321,13 +321,13 @@ class Test_Simple_Grammar():
         act = g.parse(inp)
         assert exp == act
 
-    def test_weirdly_named_process_exlam(self):
+    def test_weirdly_named_process_bang(self):
         inp = r"A! = 0;"
         exp = CcsRepresentation([ProcessAssignment("A!", NilProcess())], [])
         act = g.parse(inp)
         assert exp == act
     
-    def test_weirdly_named_process_hashpipe(self):
+    def test_weirdly_named_process_hash(self):
         inp = r"A# = 0;"
         exp = CcsRepresentation([ProcessAssignment("A#", NilProcess())], [])
         act = g.parse(inp)
