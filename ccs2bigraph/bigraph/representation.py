@@ -133,6 +133,21 @@ class IdBigraph(Bigraph):
         return "id"
     
 @dataclass(frozen=True)
+class IdleNameBigraph(Bigraph):
+    """
+    A bigraph representing an idle (i.e. unconnected) outer name
+
+    Example
+    >>> str(IdleNameBigraph('x'))
+    '{x}'
+    """
+    name: Link
+
+    def __str__(self) -> str:
+        return f"{{{self.name}}}"
+
+
+@dataclass(frozen=True)
 class ControlBigraph(Bigraph):
     """
     A Bigraph consisting of a single node of a certain control
