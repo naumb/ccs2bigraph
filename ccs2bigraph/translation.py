@@ -5,6 +5,7 @@ Translation of a CCS representation to a Bigraph representation
 from functools import reduce
 from .ccs import representation as ccs
 from .ccs.validation import FinitePureCcsValidatior 
+from .ccs.augmentation import CcsAugmentator
 from .bigraph import representation as big
 
 class FiniteCcsTranslator(object):
@@ -13,7 +14,7 @@ class FiniteCcsTranslator(object):
     """
     def __init__(self, ccs: ccs.CcsRepresentation) -> None:
         self._ccs = ccs
-        self._big = None
+        self._ccs_actions = self._ccs.get_all_actions()
 
     def _generate_ccs_controls(self) -> list[big.ControlDefinition]:
         """
@@ -34,7 +35,9 @@ class FiniteCcsTranslator(object):
         def _translation_helper(current: ccs.Process) -> big.Bigraph:
             match current:
                 case ccs.NilProcess():
-                    return big.OneBigraph()
+                    merging: list[big.Bigraph] = [big.IdleNameBigraph(big.Link(a.name)) for a in self._ccs_actions]
+                    merging.append(big.ControlBigraph(big.ControlByName("Nil"), []))
+                    return big.MergedBigraphs(merging)
                 case ccs.ProcessByName():
                     return big.BigraphByName(str(current))
                 case ccs.PrefixedProcess(prefix=prefix, remaining=remaining):
@@ -67,7 +70,7 @@ class FiniteCcsTranslator(object):
 
                     # Create C(L, C(L, C(L, _t(p)))) form by folding/reducing
                     return reduce(_closed_helper, links, _translation_helper(process))
-                case ccs.RenamingProcess(process=process, renaming=renaming):
+                case ccs.RenamingProcess(process=process, renaming=renaming):  # pyright: ignore[reportUnusedVariable]
                     # Problem with Renaming: we don't know which actions to rename yet.
                     # Also, we cannot rename all following actions on process level here, since we do not know which actions to rename.
                     raise RuntimeError("NYI")
@@ -94,3 +97,14 @@ class FiniteCcsTranslator(object):
         ]
 
         return result
+
+    def translate(self, init_process: str) -> big.BigraphRepresentation:
+        for pa in self._ccs.process_assignments:
+            pa.process = CcsAugmentator.augment(pa.process)
+
+        return big.BigraphRepresentation(
+            self._generate_ccs_controls(),
+            self._generate_bigraph_content(),
+            big.BigraphByName(init_process),
+            big.BigraphReaction()
+        )
