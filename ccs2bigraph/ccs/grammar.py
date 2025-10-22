@@ -180,7 +180,6 @@ _ccs.set_parse_action(_ccs_parse_action)
 
 def parse(raw: str) -> CcsRepresentation:
     """CCS Process file (c.f. CAAL input) parsing"""
-    logger.info(f"Trying to parse {raw}")
+    logger.info(f"Parsing {raw}")
     res = tp.cast(CcsRepresentation, _ccs.parse_string(raw, True)[0])
-    logger.info(f"Done parsing {raw}")
     return res
