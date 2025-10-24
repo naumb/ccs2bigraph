@@ -20,19 +20,26 @@ class FiniteCcsTranslator(object):
     def _generate_ccs_controls(self) -> list[big.ControlDefinition]:
         """
         Includes the Bigraph Controls for CCS
+
+        Besides 'Alt', 'Send', 'Get', and 'Nil' as defined by Millner, we introduced 'Ccs', 'Active', 'Template', and 'Rec' for recursively defined processes.
         """
 
         return [
             big.ControlDefinition(big.Control("Ccs", 0)),
-            big.ControlDefinition(big.AtomicControl("Nil", 0)),
+            big.ControlDefinition(big.Control("Active", 0)),
+            big.ControlDefinition(big.Control("Template", 1)),
+            big.ControlDefinition(big.AtomicControl("Rec", 1)),
             big.ControlDefinition(big.Control("Alt", 0)),
             big.ControlDefinition(big.Control("Send", 1)),
             big.ControlDefinition(big.Control("Get", 1)),
+            big.ControlDefinition(big.AtomicControl("Nil", 0)),
         ]
     
     def _generate_bigraph_reactions(self) -> list[big.BigraphReaction]:
         """
         Includes the Bigraph Reaction rules for CCS
+
+        Besides the rule "ccs_react" as defined by Millner, we introduced the rules "ccs_send", "ccs_get", "ccs_react_hidden". Further, we introduced the rule "ccs_meta_recurse" for recursively defined processes.
         """
         return [
             big.BigraphReaction(
@@ -62,6 +69,26 @@ class FiniteCcsTranslator(object):
                     @[0, 2];
                 """)
             ),
+            big.BigraphReaction(
+                "ccs_react_hidden",
+                dedent("""\
+                    /hidden Ccs.(Active.((Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
+                    ->
+                    Ccs.(Active.(id | id) | id)
+                    @[0, 2, 4];
+                """)
+            ),
+            big.BigraphReaction(
+                "ccs_meta_recurse",
+                dedent("""\
+                    Ccs.(Active.Rec{rec} | Template{rec}.id | id) 
+                    ->
+                    Ccs.(Active.id | Template{rec}.id | id)
+                    @[0, 0, 1];
+                """)
+            ),
+
+
         ]
 
     def _generate_bigraph_content(self) -> list[big.BigraphAssignment]:
