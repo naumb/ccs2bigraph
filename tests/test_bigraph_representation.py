@@ -330,20 +330,32 @@ class Test_Ccs_Bigraph():
         ctrl Send = 1;
         ctrl Get = 1;
     """)
-    
+
+    _CCS_REACTION = [
+        BigraphReaction(
+                "ccs_react",
+                dedent("""\
+                    Ccs.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
+                    ->
+                    Ccs.({action} | id | id)
+                    @[0, 2];
+                """)
+            ),
+    ]   
+
     _CCS_REACTION_RESULT = dedent("""\
         react ccs_react = 
-            (Alt.(Send{a}.id | id)) | (Alt.(Get{a}.id | id))
+            Ccs.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
             ->
-            {a} | id | id
+            Ccs.({action} | id | id)
             @[0, 2];
     """)
     
-    def _CCS_BRS_RESULT(self, init: str) -> str:
+    def _CCS_BRS_RESULT(self, init: str, rule_names: list[str]) -> str:
         return dedent(f"""\
             begin brs
                 init {init};
-                rules = [{{ccs_react}}];
+                rules = [{{{",".join(rule_names)}}}];
             end
         """)
 
@@ -351,14 +363,15 @@ class Test_Ccs_Bigraph():
         inp = BigraphRepresentation(
             self._CCS_CONTROLS,
             [],
-            BigraphByName("Bogus")
+            BigraphByName("Bogus"),
+            [],
         )
 
         exp = "\n".join([
             self._CCS_CONTROLS_RESULT,
             "\n", # No bigraphs, so just the empty line
-            self._CCS_REACTION_RESULT,
-            self._CCS_BRS_RESULT("Bogus")
+            "", # No reaction rules
+            self._CCS_BRS_RESULT("Bogus", [])
         ])
 
         act = str(inp)
@@ -379,14 +392,15 @@ class Test_Ccs_Bigraph():
                     )
                 )
             ],
-            BigraphByName("Test")
+            BigraphByName("Test"),
+            self._CCS_REACTION
         )
 
         exp = "\n".join([
             self._CCS_CONTROLS_RESULT,
             "big Test = (C{a,b}.id);\n",
             self._CCS_REACTION_RESULT,
-            self._CCS_BRS_RESULT("Test")
+            self._CCS_BRS_RESULT("Test", ["ccs_react"])
         ])
 
         act = str(inp)
@@ -418,14 +432,15 @@ class Test_Ccs_Bigraph():
                     )
                 )
             ],
-            BigraphByName("A")
+            BigraphByName("A"),
+            self._CCS_REACTION
         )
         exp = "\n".join([
             self._CCS_CONTROLS_RESULT,
             "big A = (C1{a,b}.id);",
             "big B = (C2{c,d}.id);\n",
             self._CCS_REACTION_RESULT,
-            self._CCS_BRS_RESULT("A")
+            self._CCS_BRS_RESULT("A", ["ccs_react"])
         ])
 
         act = str(inp)
