@@ -1,0 +1,4 @@
+* This is a test file for mutual recursive processes.
+
+A = a.B;
+B = b.A;
