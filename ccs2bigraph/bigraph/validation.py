@@ -95,9 +95,3 @@ class BigraphValidator:
 
         controls = [c.control for c in self.content.controls]
         return all([_validate_connected_ports_helper(b.bigraph, controls) for b in self.content.bigraphs])
-    
-    def _validate_is_ground(self) -> bool:
-        def _validate_is_ground_helper(current: Bigraph) -> bool:
-            return True
-        
-        return all([_validate_is_ground_helper(b.bigraph) for b in self.content.bigraphs])
