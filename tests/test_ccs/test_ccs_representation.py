@@ -84,3 +84,132 @@ class Test_Processes():
         exp = "Test = 0;"
         act = str(inp)
         assert exp == act
+
+class Test_CcsRepresentation_Get_Actions():
+    def test_empty_result(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment("Test", NilProcess()),
+            ], 
+            [] # Empty ActionSetAssignments
+        )
+
+        exp: set[Action] = set()
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_process_actions(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment(
+                    "Test",
+                    PrefixedProcess(
+                        Action("foo"),
+                        NilProcess()
+                    )
+                ),
+            ], 
+            [] # Empty ActionSetAssignments
+        )
+
+        exp = set([Action("foo")])
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_action_assignments(self):
+        inp = CcsRepresentation(
+            [], # Empty ProcessAssignments
+            [
+                ActionSetAssignment(
+                    "Actions",
+                    ActionSet([
+                        Action("foo")
+                    ])
+                )
+            ]
+        )
+
+        exp = set([Action("foo")])
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_action_mix(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment(
+                    "Test",
+                    PrefixedProcess(
+                        Action("foo"),
+                        NilProcess()
+                    )
+                ),
+            ], 
+            [
+                ActionSetAssignment(
+                    "Actions",
+                    ActionSet([Action("bar")])
+                )
+            ]
+        )
+
+        exp = set([Action("foo"), Action("bar")])
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_hiding_process(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment(
+                    "Test",
+                    HidingProcess(
+                        NilProcess(),
+                        ActionSet([Action("foo")])
+                    )
+                ),
+            ], 
+            [] # Empty ActionSetAssignments
+        )
+        exp = set([Action("foo")])
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_hiding_process_2(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment(
+                    "Test",
+                    HidingProcess(
+                        NilProcess(),
+                        ActionSetByName("Actions")
+                    )
+                ),
+            ], 
+            [
+                ActionSetAssignment(
+                    "Actions",
+                    ActionSet([Action("foo")])
+                )
+            ] 
+        )
+        exp = set([Action("foo")])
+        act = inp.get_all_actions()
+        assert exp == act
+
+    def test_renaming_process(self):
+        inp = CcsRepresentation(
+            [
+                ProcessAssignment(
+                    "Test",
+                    RenamingProcess(
+                        NilProcess(),
+                        [
+                            (Action("old"), Action("new"))
+                        ]
+                    )
+                ),
+            ], 
+            [] # Empty ActionSetAssignments
+        )
+        exp = set([Action("new")])
+        act = inp.get_all_actions()
+        assert exp == act

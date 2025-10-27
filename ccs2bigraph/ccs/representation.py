@@ -293,7 +293,7 @@ class CcsRepresentation:
         
         # Gather actions from action set assignments
         for asa in self.action_set_assignments:
-            actions.union(set(asa.actionSet.actions))
+            actions = actions.union(set(asa.actionSet.actions))
 
         # Gather actions from process assignments
         def _gather_helper(p: Process) -> set[Action]:
