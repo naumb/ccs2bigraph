@@ -38,6 +38,6 @@ class FinitePureCcsValidatior(object):
                 case HidingProcess(process=p, hiding=_): return _traverse_helper(p)
                 case RenamingProcess(process=p, renaming=_): return _traverse_helper(p)
                 case ParallelProcesses(parallels=ps): return all(_traverse_helper(p) for p in ps)
-                case Process(): return False # This should not occur.
+                case Process(): raise TypeError(f"{p} may not be an abstract process.")
 
         return all(_traverse_helper(p) for p in [pa.process for pa in ccs.process_assignments])
