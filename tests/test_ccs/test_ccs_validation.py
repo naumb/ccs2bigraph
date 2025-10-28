@@ -1,6 +1,6 @@
 """Bigraph Validation Tests"""
 
-from ccs2bigraph.ccs.augmentation import CcsAugmentator
+from ccs2bigraph.ccs.augmentation import CcsAugmentor
 from ccs2bigraph.ccs.validation import *
 from ccs2bigraph.ccs.representation import *
 
@@ -81,7 +81,7 @@ class Test_Complex_Bigraph_Validation():
             ]
         )
 
-        inp = CcsAugmentator.augment(inp)
+        inp = CcsAugmentor.augment(inp)
 
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
@@ -240,6 +240,6 @@ class Test_Complex_Bigraph_Validation():
         )
 
         # Use Augmentation here, even if this is a bit fuzzy
-        inp = CcsAugmentator.augment(inp)
+        inp = CcsAugmentor.augment(inp)
 
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True

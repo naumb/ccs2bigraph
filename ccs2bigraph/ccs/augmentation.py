@@ -10,7 +10,7 @@ from .representation import *
 
 import copy
 
-class CcsAugmentator(object):
+class CcsAugmentor(object):
     """
     Wrapper class for Augmentation
     """
@@ -86,4 +86,4 @@ class CcsAugmentator(object):
     
     @staticmethod
     def augment(process: Process) -> Process:
-        return CcsAugmentator._augment_prefixes(CcsAugmentator._augment_parents(process))
+        return CcsAugmentor._augment_prefixes(CcsAugmentor._augment_parents(process))

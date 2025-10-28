@@ -6,7 +6,7 @@ from functools import reduce
 from textwrap import dedent
 from .ccs import representation as ccs
 from .ccs.validation import FinitePureCcsValidatior 
-from .ccs.augmentation import CcsAugmentator
+from .ccs.augmentation import CcsAugmentor
 from .bigraph import representation as big
 
 class FiniteCcsTranslator(object):
@@ -164,7 +164,7 @@ class FiniteCcsTranslator(object):
 
     def translate(self, init_process: str) -> big.BigraphRepresentation:
         for pa in self._ccs.process_assignments:
-            pa.process = CcsAugmentator.augment(pa.process)
+            pa.process = CcsAugmentor.augment(pa.process)
 
         return big.BigraphRepresentation(
             self._generate_ccs_controls(),
