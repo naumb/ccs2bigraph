@@ -290,8 +290,8 @@ class BigraphRepresentation(object):
 
     controls: list[ControlDefinition]
     bigraphs: list[BigraphAssignment]
-    init_bigraph: BigraphByName
     reactions: list[BigraphReaction]
+    init_bigraph: BigraphByName = BigraphByName("start")
 
     def __str__(self):
         controls_str = "\n".join(map(str, self.controls)) + "\n"

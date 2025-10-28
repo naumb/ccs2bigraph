@@ -41,9 +41,9 @@ def main():
         ccs = ccs_grammar.parse(ccs_input)
 
         logger.info("Translating to Bigraph representation")
-        translator = FiniteCcsTranslator(ccs)
+        translator = FiniteCcsTranslator(ccs, init_process)
         
-        bigraph = translator.translate(init_process)
+        bigraph = translator.translate()
 
         logger.info("Printing Bigraph to stdout")
         print(bigraph)
