@@ -1,0 +1,22 @@
+[project]
+name = "ccs2bigraph"
+version = "0.1.0"
+dependencies = [
+    "pyparsing"
+]
+
+[project.optional-dependencies]
+test = [
+    "coverage",
+    "pytest",
+    "pytest-cov"
+]
+
+[build-system]
+requires = ["setuptools>=65.5.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ccs2bigraph*"]
+exclude = ["tests*", "docs*", "res*"]
