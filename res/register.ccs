@@ -1,0 +1,82 @@
+* Implementation: TwoBitRegisterImplementation from two Single-bit-Latches
+* Impl: Single-bit-Latch
+* Latch0 = 's0.Latch0 + 's1.Latch1 + g0.Latch0;
+* Latch1 = 's1.Latch1 + 's0.Latch0 + g1.Latch1;
+
+* Since renaming isnt supported yet, model the two latches explicitly
+Latch00 = 'b0s0.Latch0 + 'b0s1.Latch1 + b0g0.Latch0;
+Latch01 = 'b0s1.Latch1 + 'b0s0.Latch0 + b0g1.Latch1;
+Latch10 = 'b1s0.Latch0 + 'b1s1.Latch1 + b1g0.Latch0;
+Latch11 = 'b1s1.Latch1 + 'b1s0.Latch0 + b1g1.Latch1;
+
+Mutex = 'lock.'unlock.Mutex;
+
+* Writes: Sequentialized, although concurrent would also be possible.
+Write = 
+    lock.(
+        'w0.b1s0.b0s0.unlock.Write
+        + 'w1.b1s0.b0s1.unlock.Write
+        + 'w2.b1s1.b0s0.unlock.Write
+        + 'w3.b1s1.b0s1.unlock.Write
+    );
+
+Read = 
+    lock.(
+        'b1g0.(
+            'b0g0.r0.unlock.Read
+            + 'b0g1.r1.unlock.Read
+        )
+        + 'b1g1.(
+            'b0g0.r2.unlock.Read
+            + 'b0g1.r3.unlock.Read
+        )
+    );
+
+* Impl: Composition
+set Internals = {lock, unlock, b0s0, b0s1, b0g0, b0g1, b1s0, b1s1, b1g0, b1g1};
+TwoBitRegisterImpl = (
+*    Latch0[b0s0/s0, b0s1/s1, b0g0/g0, b0g1/g1] 
+*    | Latch0[b1s0/s0, b1s1/s1, b1g0/g0, b1g1/g1]
+    Latch00
+    | Latch10
+    | Read 
+    | Write 
+    | Mutex
+) \ Internals;
+
+* Spec: Two-bit-Register
+set MutexEvents = {lock, unlock};
+TwoBitRegister = TwoBitRegister0;
+
+TwoBitRegister0 = 
+    lock.(
+        TwoBitRegisterWrite
+        + lock.r0.unlock.TwoBitRegister0
+    );
+
+TwoBitRegister1 = 
+    lock.(
+        TwoBitRegisterWrite
+        + lock.r1.unlock.TwoBitRegister1
+    );
+                
+TwoBitRegister2 =
+    lock.(
+        TwoBitRegisterWrite
+        + lock.r2.unlock.TwoBitRegister2
+    );
+
+TwoBitRegister3 =
+    lock.(
+        TwoBitRegisterWrite
+        + lock.r3.unlock.TwoBitRegister3
+    );
+                
+TwoBitRegisterWrite = 
+    'w0.unlock.TwoBitRegister0               
+    + 'w1.unlock.TwoBitRegister1
+    + 'w2.unlock.TwoBitRegister2
+    + 'w3.unlock.TwoBitRegister3;
+                    
+Impl = TwoBitRegisterImpl;
+Spec = TwoBitRegister;
