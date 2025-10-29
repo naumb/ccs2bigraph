@@ -1,5 +1,7 @@
 """Bigraph Validation Tests"""
 
+import pytest
+
 from ccs2bigraph.ccs.augmentation import CcsAugmentor
 from ccs2bigraph.ccs.validation import *
 from ccs2bigraph.ccs.representation import *
@@ -18,7 +20,9 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
 
     def test_prefixed_process_validation(self):
         inp = PrefixedProcess(Action("a"), NilProcess())
-        assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
+
+        with pytest.raises(ValueError):
+            FinitePureCcsValidatior.validate(helper_wrap_process(inp))
 
     def test_wrapped_prefixed_process_validation(self):
         inp = SumProcesses([PrefixedProcess(Action("a"), NilProcess())])
@@ -40,7 +44,8 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
 
     def test_sum_processes_failed_validation(self):
         inp = SumProcesses([NilProcess(), ProcessByName("A")])
-        assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
+        with pytest.raises(ValueError):
+            FinitePureCcsValidatior.validate(helper_wrap_process(inp))
 
     def test_sum_processes_successful_validation(self):
         inp = (SumProcesses([PrefixedProcess(Action("x"), NilProcess()), PrefixedProcess(DualAction("x"), NilProcess())]))
@@ -159,7 +164,8 @@ class Test_Complex_Bigraph_Validation():
                 ),
             ]
         )
-        assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == False
+        with pytest.raises(ValueError):
+            FinitePureCcsValidatior.validate(helper_wrap_process(inp))
 
     def test_complex_process_A_successful_validation(self):
         inp = ParallelProcesses(

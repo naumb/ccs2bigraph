@@ -1,11 +1,10 @@
 """
 Validation of CCS Processes
 """
-
-from .representation import *
-
 import logging
 logger = logging.getLogger(__name__)
+
+from .representation import *
 
 class FinitePureCcsValidatior(object):
     """
@@ -15,7 +14,7 @@ class FinitePureCcsValidatior(object):
     """
 
     @staticmethod
-    def validate(ccs: CcsRepresentation):
+    def validate(ccs: CcsRepresentation) -> bool:
         """
         Static method to execute the validation check
 
@@ -31,13 +30,41 @@ class FinitePureCcsValidatior(object):
             """
             match p:
                 case SumProcesses(sums=sums):
-                    return all([(isinstance(s, PrefixedProcess) and _traverse_helper(s)) for s in sums])
-                case NilProcess(): return True
-                case ProcessByName(): return True #TODO: is this correct?
-                case PrefixedProcess(prefix=_, remaining=r): return isinstance(p.parent, SumProcesses) and _traverse_helper(r)
-                case HidingProcess(process=p, hiding=_): return _traverse_helper(p)
-                case RenamingProcess(process=p, renaming=_): return _traverse_helper(p)
-                case ParallelProcesses(parallels=ps): return all(_traverse_helper(p) for p in ps)
-                case Process(): raise TypeError(f"{p} may not be an abstract process.")
-
-        return all(_traverse_helper(p) for p in [pa.process for pa in ccs.process_assignments])
+                    # Check whether all children are prefixed
+                    if not all([isinstance(s, PrefixedProcess) for s in sums]): 
+                        raise ValueError("Unguarded child in Sum!", p)
+                    
+                    return all(map(_traverse_helper, sums))
+                
+                case NilProcess(): 
+                    # Correct by definition
+                    return True
+                
+                case ProcessByName(): 
+                    # TODO: is this correct?
+                    return True
+                
+                case PrefixedProcess(prefix=_, remaining=r): 
+                    # Check if parent is a SumProcess
+                    if not isinstance(p.parent, SumProcesses): 
+                        raise ValueError("Prefix without Sum-parent!", p)
+                    
+                    # Check remaining process after prefix
+                    return _traverse_helper(r)
+                
+                case HidingProcess(process=p, hiding=_): 
+                    # No errors possible, check remaining process
+                    return _traverse_helper(p)
+                
+                case RenamingProcess(process=p, renaming=_): 
+                    # No errors possible, check remaining process
+                    return _traverse_helper(p)
+                
+                case ParallelProcesses(parallels=ps): 
+                    return all(map(_traverse_helper, ps))
+                
+                case Process(): 
+                    raise TypeError(f"{p} may not be an abstract process.")
+        
+        # All Checks passed
+        return all(map(_traverse_helper, [pa.process for pa in ccs.process_assignments]))

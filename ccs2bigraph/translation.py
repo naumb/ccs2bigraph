@@ -193,7 +193,7 @@ class FiniteCcsTranslator(object):
         if not len(self._ccs.process_assignments) >= 1:
             raise ValueError("No processes defined.")
         if not FinitePureCcsValidatior.validate(self._ccs):
-            raise ValueError("Invalid Processes. TODO: Which?")
+            raise ValueError("Invalid Processes.")
 
         bigraph_assignments = [
             self._generate_bigraph_assignment_from_process_assignment(pa)
