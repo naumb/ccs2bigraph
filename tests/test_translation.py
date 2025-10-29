@@ -38,28 +38,28 @@ class Test_Ccs_ReactionRules():
             @[0, 0, 1];
 
         react ccs_dual =
-            Ccs.Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
+            Ccs.(Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id))) | id)
             ->
-            Ccs.Execute.({action} | id | id)
-            @[0, 2];
+            Ccs.(Execute.({action} | id | id) | id)
+            @[0, 2, 4];
 
         react ccs_send =
-            Ccs.Execute.((Alt.(Send{action}.id | id)) | id)
+            Ccs.(Execute.((Alt.(Send{action}.id | id)) | id) | id)
             ->
-            Ccs.Execute.({action} | id | id)
-            @[0, 2];
+            Ccs.(Execute.({action} | id | id) | id)
+            @[0, 2, 3];
 
         react ccs_get =
-            Ccs.Execute.((Alt.(Get{action}.id | id)) | id)
+            Ccs.(Execute.((Alt.(Get{action}.id | id)) | id) | id)
             ->
-            Ccs.Execute.({action} | id | id)
-            @[0, 2];
+            Ccs.(Execute.({action} | id | id) | id)
+            @[0, 2, 3];
 
         react ccs_dual_hidden =
-            /hidden Ccs.Execute.(Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
+            /hidden Ccs.(Execute.((Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id)) | id) | id)
             ->
-            Ccs.Execute.(id | id) | id)
-            @[0, 2, 4];\n
+            Ccs.(Execute.(id | id | id) | id)
+            @[0, 2, 4, 5];\n
     """)
 
     def test_reaction_rules(self):

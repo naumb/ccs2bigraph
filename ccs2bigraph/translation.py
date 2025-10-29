@@ -43,37 +43,37 @@ class FiniteCcsTranslator(object):
         big.BigraphReaction(
             "ccs_dual",
             dedent("""\
-                Ccs.Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
+                Ccs.(Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id))) | id)
                 ->
-                Ccs.Execute.({action} | id | id)
-                @[0, 2];
+                Ccs.(Execute.({action} | id | id) | id)
+                @[0, 2, 4];
             """)
         ),
         big.BigraphReaction(
             "ccs_send",
             dedent("""\
-                Ccs.Execute.((Alt.(Send{action}.id | id)) | id)
+                Ccs.(Execute.((Alt.(Send{action}.id | id)) | id) | id)
                 ->
-                Ccs.Execute.({action} | id | id)
-                @[0, 2];
+                Ccs.(Execute.({action} | id | id) | id)
+                @[0, 2, 3];
             """)
         ),
         big.BigraphReaction(
             "ccs_get",
             dedent("""\
-                Ccs.Execute.((Alt.(Get{action}.id | id)) | id)
+                Ccs.(Execute.((Alt.(Get{action}.id | id)) | id) | id)
                 ->
-                Ccs.Execute.({action} | id | id)
-                @[0, 2];
+                Ccs.(Execute.({action} | id | id) | id)
+                @[0, 2, 3];
             """)
         ),
         big.BigraphReaction(
             "ccs_dual_hidden",
             dedent("""\
-                /hidden Ccs.Execute.(Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
+                /hidden Ccs.(Execute.((Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id)) | id) | id)
                 ->
-                Ccs.Execute.(id | id) | id)
-                @[0, 2, 4];
+                Ccs.(Execute.(id | id | id) | id)
+                @[0, 2, 4, 5];
             """)
         ),
     ]
