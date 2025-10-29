@@ -22,7 +22,6 @@ class BigraphValidator:
     ...     BigraphRepresentation(
     ...         [ControlDefinition(AtomicControl("M", 1))],
     ...         [BigraphAssignment("Test", NestingBigraph(ControlBigraph(ControlByName("M"),[Link("x")]), OneBigraph()))],
-    ...         BigraphByName("Test"),
     ...         [BigraphReaction(
     ...             "ccs_react",
     ...             "Ccs.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id))) -> Ccs.({action} | id | id) @[0, 2];"

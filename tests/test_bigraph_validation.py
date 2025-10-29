@@ -28,7 +28,6 @@ class Test_Simple_Bigraph_Validation():
                     )
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == True
@@ -55,7 +54,6 @@ class Test_Simple_Bigraph_Validation():
                     )
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == False
@@ -74,7 +72,6 @@ class Test_Simple_Bigraph_Validation():
                     )
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == False
@@ -93,7 +90,6 @@ class Test_Simple_Bigraph_Validation():
                     )
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == False
@@ -112,7 +108,6 @@ class Test_Simple_Bigraph_Validation():
                     )
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == False
@@ -127,7 +122,6 @@ class Test_Simple_Bigraph_Validation():
                     IdBigraph()
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
         assert BigraphValidator(inp).validate() == True
@@ -142,7 +136,6 @@ class Test_Simple_Bigraph_Validation():
                     Bigraph()
                 ),
             ],
-            BigraphByName("Test1"),
             [],
         )
 
@@ -209,7 +202,6 @@ class Test_Complex_Bigraph_Validation():
                     )
                 )
             ],
-            BigraphByName("Test"),
             [],
         )
         assert BigraphValidator(inp).validate() == True

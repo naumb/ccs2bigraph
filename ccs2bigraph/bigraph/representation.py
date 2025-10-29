@@ -266,16 +266,11 @@ class BigraphReaction(object):
 
     :param str rules: The reaction rules. For now, they are defined as a string since they are constant for CCS.
     """
-    name: str = "ccs_react"
-    rule: str = dedent("""\
-        (Alt.(Send{a}.id | id)) | (Alt.(Get{a}.id | id))
-        ->
-        {a} | id | id
-        @[0, 2];
-    """)
+    name: str
+    rule: str 
     
     def __str__(self):
-        return f"react {self.name} = \n" + indent(self.rule, '    ')
+        return f"react {self.name} =\n" + indent(self.rule, '    ')
     
 @dataclass(frozen=True)
 class BigraphRepresentation(object):
@@ -296,7 +291,7 @@ class BigraphRepresentation(object):
     def __str__(self):
         controls_str = "\n".join(map(str, self.controls)) + "\n"
         bigraphs_str = "\n".join(map(str, self.bigraphs)) + "\n"
-        reactions_str = "\n".join(map(str, self.reactions))
+        reactions_str = "\n".join(map(str, self.reactions)) + "\n"
         reactions_names_str = ", ".join([r.name for r in self.reactions])
         brs_str = dedent(f"""\
             begin brs

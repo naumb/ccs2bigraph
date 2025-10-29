@@ -13,120 +13,107 @@ class FiniteCcsTranslator(object):
     """
     Translation of Finite CCS into bigraphs
     """
+
+    CCS_CONTROLS: list[big.ControlDefinition] = [
+        big.ControlDefinition(big.Control("Ccs", 0)),
+        big.ControlDefinition(big.Control("Execute", 0)),
+        big.ControlDefinition(big.Control("Process", 1)),
+        big.ControlDefinition(big.AtomicControl("Call", 1)),
+        big.ControlDefinition(big.Control("Alt", 0)),
+        big.ControlDefinition(big.Control("Send", 1)),
+        big.ControlDefinition(big.Control("Get", 1)),
+        big.ControlDefinition(big.AtomicControl("Nil", 0)),
+    ]
+    """
+    The Bigraph Controls for CCS
+
+    Besides 'Alt', 'Send', 'Get', and 'Nil' as defined by Millner, we introduced 'Ccs', 'Execute', 'Process', and 'Call' for named processes.
+    """
+
+    CCS_REACTION_RULES: list[big.BigraphReaction] = [
+        big.BigraphReaction(
+            "ccs_meta_call",
+            dedent("""\
+                Ccs.(Execute.Call{proc} | Process{proc}.id | id) 
+                ->
+                Ccs.(Execute.id | Process{proc}.id | id)
+                @[0, 0, 1];
+            """)
+        ),
+        big.BigraphReaction(
+            "ccs_dual",
+            dedent("""\
+                Ccs.Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
+                ->
+                Ccs.Execute.({action} | id | id)
+                @[0, 2];
+            """)
+        ),
+        big.BigraphReaction(
+            "ccs_send",
+            dedent("""\
+                Ccs.Execute.((Alt.(Send{action}.id | id)) | id)
+                ->
+                Ccs.Execute.({action} | id | id)
+                @[0, 2];
+            """)
+        ),
+        big.BigraphReaction(
+            "ccs_get",
+            dedent("""\
+                Ccs.Execute.((Alt.(Get{action}.id | id)) | id)
+                ->
+                Ccs.Execute.({action} | id | id)
+                @[0, 2];
+            """)
+        ),
+        big.BigraphReaction(
+            "ccs_dual_hidden",
+            dedent("""\
+                /hidden Ccs.Execute.(Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
+                ->
+                Ccs.Execute.(id | id) | id)
+                @[0, 2, 4];
+            """)
+        ),
+    ]
+    """
+    Includes the Bigraph Reaction rules for CCS
+
+    Besides the rule "ccs_dual" for synchronizing actions as defined by Millner, we introduced the rules "ccs_send", "ccs_get", "ccs_dual_hidden". Further, we introduced the rule "ccs_meta_call" for "calling" named processes.
+    """
+
     def __init__(self, ccs: ccs.CcsRepresentation, init_process: str) -> None:
         self._ccs = ccs
         self._ccs_actions = self._ccs.get_all_actions()
         self._init_bigraph = f"{init_process.lower()}_proc"
 
-    def _generate_ccs_controls(self) -> list[big.ControlDefinition]:
+    def _bigraph_name_from_process_name(self, process_name: str) -> str:
         """
-        Includes the Bigraph Controls for CCS
+        Generates a bigraph name from a given process name
 
-        Besides 'Alt', 'Send', 'Get', and 'Nil' as defined by Millner, we introduced 'Ccs', 'Active', 'Template', and 'Rec' for recursively defined processes.
+        :param str process_name: the process name to be translated
+        :return str: the resulting bigraph name. Essentially, it is the lowercase process_name, appended by '_proc'
         """
-
-        return [
-            big.ControlDefinition(big.Control("Ccs", 0)),
-            big.ControlDefinition(big.Control("Execute", 0)),
-            big.ControlDefinition(big.Control("Process", 1)),
-            big.ControlDefinition(big.AtomicControl("Call", 1)),
-            big.ControlDefinition(big.Control("Alt", 0)),
-            big.ControlDefinition(big.Control("Send", 1)),
-            big.ControlDefinition(big.Control("Get", 1)),
-            big.ControlDefinition(big.AtomicControl("Nil", 0)),
-        ]
+        return f"{process_name.lower()}_proc"
     
-    def _generate_bigraph_reactions(self) -> list[big.BigraphReaction]:
+    def _bigraph_assignment_name_from_process_name(self, process_name: str) -> str:
         """
-        Includes the Bigraph Reaction rules for CCS
+        Generates a bigraph assignment name for a given process name
 
-        Besides the rule "ccs_react" as defined by Millner, we introduced the rules "ccs_send", "ccs_get", "ccs_react_hidden". Further, we introduced the rule "ccs_meta_recurse" for recursively defined processes.
+        :param str process_name: the process name to be used
+        :return str: the resulting bigraph assignment name. Essentially, it is the `_bigraph_name_from_process_name`, appended by '_def'.
         """
-
-        # react ccs_meta_recurse =
-        #     Behavior.(Current.Call{rec} | Program{rec}.id | id) 
-        #     ->
-        #     Behavior.(Current.id | Program{rec}.id | id)
-        #     @[0, 0, 1];
-
-        # react ccs_dual = 
-        #     Behavior.(Current.(Alt.(Send{action}.id | id)) | Current.(Alt.(Get{action}.id | id)) | id)
-        #     ->
-        #     Behavior.((Current.id | Current.id) | id | {action}) 
-        #     @[0, 2, 4];
-
-        # # additional reaction rule for individual sending
-        # react ccs_send = 
-        #     Behavior.(Current.((Alt.(Send{action}.id | id)) | id) | id)
-        #     ->
-        #     Behavior.(Current.({action} | id | id) | id)
-        #     @[0, 2, 3];
-
-        # # additional reaction rules for individual receiving
-        # react ccs_get = 
-        #     Behavior.(Current.((Alt.(Get{action}.id | id)) | id) | id)
-        #     ->
-        #     Behavior.(Current.({action} | id | id) | id)
-        #     @[0, 2, 3];
-
-        # # additional reaction rules for hidden stuff
-        # react ccs_dual_hidden = 
-        #     /hidden Behavior.(Current.((Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
-        #     ->
-        #     Behavior.(Current.(id | id) | id)
-        #     @[0, 2, 4];
-
-        return [
-            big.BigraphReaction(
-                "ccs_meta_call",
-                dedent("""\
-                    Ccs.(Execute.Call{proc} | Process{proc}.id | id) 
-                    ->
-                    Ccs.(Execute.id | Process{proc}.id | id)
-                    @[0, 0, 1];
-                """)
-            ),
-            big.BigraphReaction(
-                "ccs_dual",
-                dedent("""\
-                    Ccs.Execute.((Alt.(Send{action}.id | id)) | (Alt.(Get{action}.id | id)))
-                    ->
-                    Ccs.Execute.({action} | id | id)
-                    @[0, 2];
-                """)
-            ),
-            big.BigraphReaction(
-                "ccs_send",
-                dedent("""\
-                    Ccs.Execute.((Alt.(Send{action}.id | id)) | id)
-                    ->
-                    Ccs.({action} | id | id)
-                    @[0, 2];
-                """)
-            ),
-            big.BigraphReaction(
-                "ccs_get",
-                dedent("""\
-                    Ccs.Execute.((Alt.(Get{action}.id | id)) | id)
-                    ->
-                    Ccs.Execute.({action} | id | id)
-                    @[0, 2];
-                """)
-            ),
-            big.BigraphReaction(
-                "ccs_dual_hidden",
-                dedent("""\
-                    /hidden Ccs.Execute.(Alt.(Send{hidden}.id | id)) | (Alt.(Get{hidden}.id | id))) | id)
-                    ->
-                    Ccs.Execute.(id | id) | id)
-                    @[0, 2, 4];
-                """)
-            ),
-        ]
-
-    def _generate_bigraph_content(self) -> list[big.BigraphAssignment]:
+        return f"{self._bigraph_name_from_process_name(process_name)}_def"
+    
+    def _generate_bigraph_assignment_from_process_assignment(self, process_assignment: ccs.ProcessAssignment) -> big.BigraphAssignment: 
         """
-        Applies the Ccs -> Bigraph transformation
+        Generates a bigraph assignment from a ccs process assignment.
+
+        It will use `_bigraph_assignment_name_from_process_name` as the bigraph assignment name and `_bigraph_name_from_process_name` to refer to the process itself. Further, the resulting behavior will be nested in a `ControlByName('Process')` Control with a link to `_bigraph_name_from_process_name`
+
+        :param ccs.ProcessAssignment process_assignment: The process assignment to be translated
+        :return big.BigraphAssignment: The resulting translation. 
         """
         def _translation_helper(current: ccs.Process) -> big.Bigraph:
             match current:
@@ -182,7 +169,25 @@ class FiniteCcsTranslator(object):
                     )
                 case ccs.Process(): raise TypeError(f"{current} may not be an abstract process.")
 
+        return big.BigraphAssignment(
+                self._bigraph_assignment_name_from_process_name(process_assignment.name),
+                big.NestingBigraph(
+                    big.ControlBigraph(big.ControlByName("Process"), [
+                        big.Link(
+                            self._bigraph_name_from_process_name(process_assignment.name)
+                        )
+                    ]),
+                    _translation_helper(process_assignment.process)
+                )
+            ) 
+    
+    def _generate_bigraph_content(self) -> list[big.BigraphAssignment]:
+        """
+        Applies the Ccs -> Bigraph transformation
+        """
+        
         # Initially, assert that
+        # - there is at least one process to be translated
         # - the process is valid for pure finite ccs (i.e. all alternatives are prefix-guarded)
 
         if not len(self._ccs.process_assignments) >= 1:
@@ -191,19 +196,9 @@ class FiniteCcsTranslator(object):
             raise ValueError("Invalid Processes. TODO: Which?")
 
         bigraph_assignments = [
-            # Keep in mind: Bigraph identifiers must be lowercase names
-            big.BigraphAssignment(
-                f"{pa.name.lower()}_proc_def",
-                big.NestingBigraph(
-                    big.ControlBigraph(big.ControlByName("Process"), [
-                        big.Link(f"{pa.name.lower()}_proc")
-                    ]),
-                    _translation_helper(pa.process)
-                )
-            ) 
+            self._generate_bigraph_assignment_from_process_assignment(pa)
             for pa in self._ccs.process_assignments
         ]
-
 
         # Append template for initial bigraph, essentially "calling" the corresponding process
         result = bigraph_assignments + [self._generate_init_bigraph(bigraph_assignments)]
@@ -241,7 +236,7 @@ class FiniteCcsTranslator(object):
             pa.process = CcsAugmentor.augment(pa.process)
 
         return big.BigraphRepresentation(
-            self._generate_ccs_controls(),
+            self.CCS_CONTROLS,
             self._generate_bigraph_content(),
-            self._generate_bigraph_reactions(),
+            self.CCS_REACTION_RULES,
         )
