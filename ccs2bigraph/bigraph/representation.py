@@ -229,7 +229,7 @@ class RenamingBigraph(Bigraph):
     inner: Bigraph
 
     def __str__(self) -> str:
-        return f"{self.renaming.new}/{{{",".join(map(str, self.renaming.olds))}}} ({self.inner})"
+        return f"({self.renaming.new}/{{{",".join(map(str, self.renaming.olds))}}} {self.inner})"
 
     
 @dataclass(frozen=True)
