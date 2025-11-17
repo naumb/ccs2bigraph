@@ -12,8 +12,6 @@ This file provides classes for the individual parts of algebraic Bigraph terms, 
     - nesting
     - parallel product
     - merging
-
-TODO: Make sure renaming is only useful for composition and not for description
 """
 
 import logging
@@ -101,6 +99,21 @@ class Link(object):
 
     def __str__(self) -> str:
         return f"{self.name}"
+    
+@dataclass(frozen=True)
+class Renaming(object):
+    """
+    Representation of a single link renaming to form new Bigraphs
+
+    This is used in :class:`RenamingBigraph` to capsule the renaming of links.
+    It can also express merging of links (i.e. when two names are combined to a new outer name)
+
+    :param Link new: New Link name
+    :param list[Link] olds: Old link names
+    """
+
+    new: Link
+    olds: list[Link]
 
 class Bigraph(ABC):
     """
@@ -202,6 +215,21 @@ class NestingBigraph(Bigraph):
 
     def __str__(self) -> str:
         return f"({self.control}.{self.inner})"
+    
+@dataclass(frozen=True)
+class RenamingBigraph(Bigraph):
+    """
+    A Bigraph resulting from a renaming operation
+
+    :param Renaming renaming: The used renaming relation
+    :param Bigraph inner: The Bigraph on which the renaming is applied to
+    """
+
+    renaming: Renaming
+    inner: Bigraph
+
+    def __str__(self) -> str:
+        return f"{self.renaming.new}/{{{",".join(map(str, self.renaming.olds))}}} ({self.inner})"
 
     
 @dataclass(frozen=True)

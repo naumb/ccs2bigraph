@@ -39,7 +39,7 @@ class Test_Simple_Finite_Pure_Ccs_Validation():
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_renaming_process_validation(self):
-        inp = RenamingProcess(ProcessByName("A"), [(Action("new"), Action("old"))])
+        inp = RenamingProcess(ProcessByName("A"), [Renaming(Action("new"), Action("old"))])
         assert FinitePureCcsValidatior.validate(helper_wrap_process(inp)) == True
 
     def test_sum_processes_failed_validation(self):
@@ -103,7 +103,7 @@ class Test_Complex_Bigraph_Validation():
                                     ProcessByName("One"),
                                 ),
                             ),
-                            [(Action("x"), Action("y"))],
+                            [Renaming(Action("x"), Action("y"))],
                         ),
                         HidingProcess( # Failure will occur here
                             PrefixedProcess(
@@ -112,7 +112,7 @@ class Test_Complex_Bigraph_Validation():
                                     Action("b"),
                                     RenamingProcess(
                                         ProcessByName("Two"),
-                                        [(Action("x"), Action("y"))],
+                                        [Renaming(Action("x"), Action("y"))],
                                     ),
                                 ),
                             ),
@@ -155,9 +155,9 @@ class Test_Complex_Bigraph_Validation():
                             ]
                         ),
                         [
-                            (Action("a"), Action("b")),
-                            (Action("b"), Action("a")),
-                            (Action("x"), Action("x")),
+                            Renaming(Action("a"), Action("b")),
+                            Renaming(Action("b"), Action("a")),
+                            Renaming(Action("x"), Action("x")),
                         ],
                     ),
                     ActionSet(list(map(Action, ["a", "b", "c"]))),
@@ -179,7 +179,7 @@ class Test_Complex_Bigraph_Validation():
                                     DualAction("b"),
                                     ProcessByName("One"),
                                 ),
-                                [(Action("x"), Action("y"))],
+                                [Renaming(Action("x"), Action("y"))],
                             ),
                         ),
                         PrefixedProcess(
@@ -189,7 +189,7 @@ class Test_Complex_Bigraph_Validation():
                                     Action("b"),
                                     RenamingProcess(
                                         ProcessByName("Two"),
-                                        [(Action("x"), Action("y"))],
+                                        [Renaming(Action("x"), Action("y"))],
                                     ),
                                 ),
                                 ActionSetByName("L"),
@@ -235,9 +235,9 @@ class Test_Complex_Bigraph_Validation():
                             ]
                         ),
                         [
-                            (Action("a"), Action("b")),
-                            (Action("b"), Action("a")),
-                            (Action("x"), Action("x")),
+                            Renaming(Action("a"), Action("b")),
+                            Renaming(Action("b"), Action("a")),
+                            Renaming(Action("x"), Action("x")),
                         ],
                     ),
                     ActionSet(list(map(Action, ["a", "b", "c"]))),

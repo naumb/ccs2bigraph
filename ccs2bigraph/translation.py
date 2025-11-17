@@ -151,15 +151,28 @@ class FiniteCcsTranslator(object):
                     links = map(big.Link, [a.name for a in actions])
 
                     # Helper function to swap parameters of big.ClosedBigraph
-                    def _closed_helper(b: big.Bigraph, l: big.Link) -> big.Bigraph:
+                    def _closed_parameter_swap(b: big.Bigraph, l: big.Link) -> big.Bigraph:
                         return big.ClosedBigraph(l, b) #type: ignore
 
                     # Create C(L, C(L, C(L, _t(p)))) form by folding/reducing
-                    return reduce(_closed_helper, links, _translation_helper(process))
-                case ccs.RenamingProcess(process=process, renaming=renaming):  # pyright: ignore[reportUnusedVariable]
-                    # Problem with Renaming: we don't know which actions to rename yet.
-                    # Also, we cannot rename all following actions on process level here, since we do not know which actions to rename.
-                    raise RuntimeError("NYI")
+                    return reduce(_closed_parameter_swap, links, _translation_helper(process))
+                case ccs.RenamingProcess(process=process, renaming=renaming):
+                    # Helper to translate CCS renaming into Bigraph renaming
+                    def _renaming_helper(ccs_renaming: ccs.Renaming) -> big.Renaming:
+                        return big.Renaming(
+                            big.Link(str(ccs_renaming.new)),
+                            [big.Link(str(ccs_renaming.old))]
+                        )
+
+                    big_renamings = map(_renaming_helper, renaming)
+
+                    # Helper function to swap parameters of big.ClosedBigraph
+                    def _renaming_parameter_swap(b: big.Bigraph, r: big.Renaming) -> big.Bigraph:
+                        return big.RenamingBigraph(r, b) #type: ignore
+                    
+                    # Create R(L, R(L, R(L, _t(p)))) form by folding/reducing
+                    return reduce(_renaming_parameter_swap, big_renamings, _translation_helper(process))
+                    
                 case ccs.ParallelProcesses(parallels=parallels):
                     return big.MergedBigraphs(list(map(_translation_helper, parallels)))
                 case ccs.SumProcesses(sums=sums):

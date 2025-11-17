@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 import pyparsing as pp
 import typing as tp
 
-from .representation import Action, ActionSet, ActionSetAssignment, SumProcesses, CcsRepresentation, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
+from .representation import Action, ActionSet, ActionSetAssignment, Renaming, SumProcesses, CcsRepresentation, DualAction, HidingProcess, ActionSetByName, ProcessByName, NilProcess, ParallelProcesses, PrefixedProcess, ProcessAssignment, RenamingProcess, Process
 
 # Performance
 pp.ParserElement.enable_packrat()
@@ -113,7 +113,7 @@ def _renaming_parse_action(pr: pp.ParseResults) -> RenamingProcess:
     return RenamingProcess(
         tp.cast(Process, pr[0][0]), 
         list(
-            (r[0], r[1]) 
+            Renaming(r[0], r[1]) 
             for r 
             in tp.cast(list[tuple[Action, Action]], pr[0][1:])
         )

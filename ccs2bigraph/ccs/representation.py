@@ -44,8 +44,6 @@ class DualAction(Action):
     :param str name: The name of the Action, starting with a lowercase character
     :param bool is_dual: Whether or not the action is in it's dual form (e.g. 'a)
 
-    :const 
-
     Example
     >>> str(DualAction('x'))
     "'x"
@@ -53,6 +51,21 @@ class DualAction(Action):
 
     def __str__(self) -> str:
         return f"'{self.name}"
+
+@dataclass(frozen=True)
+class Renaming(object):
+    """
+    Represents a single renaming of a CCS action
+
+    :param Action new: The new action name
+    :param Action old: The old action name which will be renamed
+    """
+
+    new: Action
+    old: Action
+
+    def __str__(self) -> str:
+        return f"{self.new}/{self.old}"
 
 @dataclass()
 class ActionSet(object):
@@ -200,21 +213,27 @@ class RenamingProcess(Process):
     """
     Process representing the result of a renaming operation
 
-    :param Process process: The `Process` of which actions will be renamed
-    :param list[tuple[Action, Action]] renaming: A list of renaming operations, i.e. tuples of `(Action(new_name), Action(old_name))`
+    :param Process process: The :class:`Process` of which actions will be renamed
+    :param list[Renaming] renaming: A list of renaming operations
 
     Example:
-    >>> str(RenamingProcess(PrefixedProcess(Action('a'), NilProcess()), [(Action("b"), Action("a")), (Action("y"), Action("z"))]))
+    >>> str(RenamingProcess(
+    ...    PrefixedProcess(Action('a'), NilProcess()),
+    ...    [
+    ...        Renaming(Action("b"), Action("a")), 
+    ...        Renaming(Action("y"), Action("z"))
+    ...    ]
+    ... ))
     '((a.0)[b/a, y/z])'
     """
     process: Process
-    renaming: list[tuple[Action, Action]]
+    renaming: list[Renaming]
 
     def __post_init__(self):
         super().__init__()
 
     def __str__(self) -> str:
-        return f"({self.process}[" + ", ".join(f"{new}/{old}" for (new, old) in self.renaming) + "])"
+        return f"({self.process}[" + ", ".join(map(str, self.renaming)) + "])"
 
 @dataclass()
 class SumProcesses(Process):
@@ -265,8 +284,6 @@ class ProcessAssignment:
     Example:
     >>> str(ProcessAssignment("A", NilProcess()))
     'A = 0;'
-    >>> str(RenamingProcess(PrefixedProcess(Action('a'), NilProcess()), [(Action("b"), Action("a")), (Action("y"), Action("z"))]))
-    '((a.0)[b/a, y/z])'
     """
     name: str
     process: Process
@@ -308,7 +325,7 @@ class CcsRepresentation:
                 case RenamingProcess(process=process, renaming=renaming):
                     return _gather_helper(process).union(
                         # Again, construct new (non-dual) actions with the same name
-                        set([Action(new_action.name) for _, new_action in renaming])
+                        set([Action(r.new.name) for r in renaming])
                     )
                 case SumProcesses(sums=processes) | ParallelProcesses(parallels=processes):
                     return set[Action].union(*map(_gather_helper, processes))

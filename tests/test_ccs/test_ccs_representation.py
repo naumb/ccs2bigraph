@@ -62,7 +62,7 @@ class Test_Processes():
         assert exp == act
 
     def test_renaming_process(self):
-        inp = RenamingProcess(ProcessByName("A"), [(Action("new"), Action("old"))])
+        inp = RenamingProcess(ProcessByName("A"), [Renaming(Action("new"), Action("old"))])
         exp = r"(A[new/old])"
         act = str(inp)
         assert exp == act
@@ -203,7 +203,7 @@ class Test_CcsRepresentation_Get_Actions():
                     RenamingProcess(
                         NilProcess(),
                         [
-                            (Action("old"), Action("new"))
+                            Renaming(Action("new"), Action("old"))
                         ]
                     )
                 ),

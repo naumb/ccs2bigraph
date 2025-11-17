@@ -290,7 +290,7 @@ class Test_Simple_Grammar():
                     PrefixedProcess(
                         Action("a"),
                         RenamingProcess(
-                            NilProcess(), [(Action("b"), Action("a"))]
+                            NilProcess(), [Renaming(Action("b"), Action("a"))]
                         ),
                     ),
                 )
@@ -309,9 +309,9 @@ class Test_Simple_Grammar():
                     RenamingProcess(
                         PrefixedProcess(Action("a"), NilProcess()),
                         [
-                            (Action("b"), Action("a")),
-                            (Action("d"), Action("c")),
-                            (Action("f"), Action("e")),
+                            Renaming(Action("b"), Action("a")),
+                            Renaming(Action("d"), Action("c")),
+                            Renaming(Action("f"), Action("e")),
                         ],
                     ),
                 )
@@ -453,7 +453,7 @@ class Test_Complex_Grammar():
                                         ProcessByName("One"),
                                     ),
                                 ),
-                                [(Action("x"), Action("y"))],
+                                [Renaming(Action("x"), Action("y"))],
                             ),
                             PrefixedProcess(
                                 DualAction("a"),
@@ -461,7 +461,7 @@ class Test_Complex_Grammar():
                                     Action("b"),
                                     RenamingProcess(
                                         ProcessByName("Two"),
-                                        [(Action("x"), Action("y"))],
+                                        [Renaming(Action("x"), Action("y"))],
                                     ),
                                 ),
                             ),
@@ -483,10 +483,10 @@ class Test_Complex_Grammar():
                     SumProcesses(
                         [
                             RenamingProcess(
-                                ProcessByName("A"), [(Action("x"), Action("y"))]
+                                ProcessByName("A"), [Renaming(Action("x"), Action("y"))]
                             ),
                             RenamingProcess(
-                                ProcessByName("B"), [(Action("x"), Action("y"))]
+                                ProcessByName("B"), [Renaming(Action("x"), Action("y"))]
                             ),
                         ]
                     ),
@@ -507,12 +507,12 @@ class Test_Complex_Grammar():
                     SumProcesses(
                         [
                             RenamingProcess(
-                                ProcessByName("A"), [(Action("x"), Action("y"))]
+                                ProcessByName("A"), [Renaming(Action("x"), Action("y"))]
                             ),
                             HidingProcess(
                                 RenamingProcess(
                                     ProcessByName("B"),
-                                    [(Action("x"), Action("y"))],
+                                    [Renaming(Action("x"), Action("y"))],
                                 ),
                                 ActionSetByName("L"),
                             ),
@@ -535,14 +535,14 @@ class Test_Complex_Grammar():
                     SumProcesses(
                         [
                             RenamingProcess(
-                                ProcessByName("A"), [(Action("x"), Action("y"))]
+                                ProcessByName("A"), [Renaming(Action("x"), Action("y"))]
                             ),
                             ParallelProcesses(
                                 [
                                     HidingProcess(
                                         RenamingProcess(
                                             ProcessByName("B"),
-                                            [(Action("x"), Action("y"))],
+                                            [Renaming(Action("x"), Action("y"))],
                                         ),
                                         ActionSetByName("L"),
                                     ),
@@ -601,9 +601,9 @@ class Test_Complex_Grammar():
                                 ]
                             ),
                             [
-                                (Action("a"), Action("b")),
-                                (Action("b"), Action("a")),
-                                (Action("x"), Action("x")),
+                                Renaming(Action("a"), Action("b")),
+                                Renaming(Action("b"), Action("a")),
+                                Renaming(Action("x"), Action("x")),
                             ],
                         ),
                         ActionSet(list(map(Action, ["a", "b", "c"]))),
@@ -634,7 +634,7 @@ class Test_Complex_Grammar():
                                                 ProcessByName("One"),
                                             ),
                                         ),
-                                        [(Action("x"), Action("y"))],
+                                        [Renaming(Action("x"), Action("y"))],
                                     ),
                                     HidingProcess(
                                         PrefixedProcess(
@@ -643,7 +643,7 @@ class Test_Complex_Grammar():
                                                 Action("b"),
                                                 RenamingProcess(
                                                     ProcessByName("Two"),
-                                                    [(Action("x"), Action("y"))],
+                                                    [Renaming(Action("x"), Action("y"))],
                                                 ),
                                             ),
                                         ),
@@ -686,9 +686,9 @@ class Test_Complex_Grammar():
                                         ]
                                     ),
                                     [
-                                        (Action("a"), Action("b")),
-                                        (Action("b"), Action("a")),
-                                        (Action("x"), Action("x")),
+                                        Renaming(Action("a"), Action("b")),
+                                        Renaming(Action("b"), Action("a")),
+                                        Renaming(Action("x"), Action("x")),
                                     ],
                                 ),
                                 ActionSet(list(map(Action, ["a", "b", "c"]))),
@@ -744,7 +744,7 @@ class Test_Ccs_Input_Grammar():
                 RenamingProcess(
                     ProcessByName("Cell"),
                     [
-                        (Action("c"), Action("b")),
+                        Renaming(Action("c"), Action("b")),
                     ]
                 )
             ),
@@ -753,8 +753,8 @@ class Test_Ccs_Input_Grammar():
                 RenamingProcess(
                     ProcessByName("Cell"),
                     [
-                        (Action("c"), Action("a")),
-                        (Action("d"), Action("b")),
+                        Renaming(Action("c"), Action("a")),
+                        Renaming(Action("d"), Action("b")),
                     ]
                 )
             ),
@@ -763,7 +763,7 @@ class Test_Ccs_Input_Grammar():
                 RenamingProcess(
                     ProcessByName("Cell"),
                     [
-                        (Action("d"), Action("a")),
+                        Renaming(Action("d"), Action("a")),
                     ]
                 )
             ),
