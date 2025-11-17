@@ -8,6 +8,7 @@ from .ccs import representation as ccs
 from .ccs.validation import FinitePureCcsValidatior 
 from .ccs.augmentation import CcsAugmentor
 from .bigraph import representation as big
+from . import config
 
 class FiniteCcsTranslator(object):
     """
@@ -118,9 +119,15 @@ class FiniteCcsTranslator(object):
         def _translation_helper(current: ccs.Process) -> big.Bigraph:
             match current:
                 case ccs.NilProcess():
-                    merging: list[big.Bigraph] = [big.IdleNameBigraph(big.Link(a.name)) for a in self._ccs_actions]
-                    merging.append(big.ControlBigraph(big.ControlByName("Nil"), []))
-                    return big.MergedBigraphs(merging)
+                    if config.add_actions:
+                        merging: list[big.Bigraph] = [
+                            big.IdleNameBigraph(big.Link(a.name)) 
+                            for a in self._ccs_actions
+                        ]
+                        merging.append(big.ControlBigraph(big.ControlByName("Nil"), []))
+                        return big.MergedBigraphs(merging)
+                    else:
+                        return big.ControlBigraph(big.ControlByName("Nil"), [])
                 case ccs.ProcessByName(name=name):
                     # ProcessByName corresponds to a "call" to a process, hence represent it accordingly.
                     # Conveniently, together with the representation of ProcessAssignments, this also solves recursive calls
