@@ -223,6 +223,13 @@ class RenamingBigraph(Bigraph):
 
     :param Renaming renaming: The used renaming relation
     :param Bigraph inner: The Bigraph on which the renaming is applied to
+    
+    Example:
+    >>> str(RenamingBigraph(
+    ...     Renaming(Link("b"), [Link("a")]),
+    ...     ControlBigraph(ControlByName("A"), [Link("a")])
+    ... ))
+    '(b/{a} A{a})'
     """
 
     renaming: Renaming
