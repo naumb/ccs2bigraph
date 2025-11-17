@@ -202,6 +202,7 @@ class FiniteCcsTranslator(object):
         # Initially, assert that
         # - there is at least one process to be translated
         # - the process is valid for pure finite ccs (i.e. all alternatives are prefix-guarded)
+        # - TODO: Renaming must be valid
 
         if not len(self._ccs.process_assignments) >= 1:
             raise ValueError("No processes defined.")
