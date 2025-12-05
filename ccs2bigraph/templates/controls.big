@@ -1,0 +1,48 @@
+# Processes
+# Wrapper for all defined processes.
+ctrl Procs = 0;
+# Head of each individual process.
+ctrl Proc = 1;
+# Control to reference another process. There may be no other nodes nested in this control.
+atomic ctrl Ref = 1;
+
+# Actions
+# Wrapper for all defined actions.
+ctrl Actions = 0;
+# Action control used to identify links as actions (in contrast to process names)
+ctrl Action = 1;
+# A control used to define a action name. Used mostly for convenience.
+atomic fun ctrl Name(name) = 0;
+# A control used to define internal (i.e. invisible) actions.
+atomic ctrl Tau = 1;
+
+# Semantics
+# A control to express something like a simple action not engaging with others.
+# TODO: Do not use them anymore.
+ctrl Do = 1;
+
+# Controls to express the actual semantics of CCS
+# TODO: Use them. :)
+ctrl Par = 0;
+ctrl Alt = 0;
+# The two ways of engaging in a (dual) action. Similiar to Millner, but with "Get" renamed to "Recv"
+# TODO: Use them. :)
+ctrl Send = 1;
+ctrl Recv = 1;
+
+# Operations (Hiding and Renaming)
+# A control represening a translation table containing all original actions and their current renaming
+ctrl Translation = 0;
+# Controls to define a renaming from an original action name to their current action name.
+# They are also used to express renaming operations (see below)
+# They (especially To) are not atomic, since afterwards additional operations (Send/Get, Hiding or other renamings) may be present in a process definition.
+ctrl From = 1;
+ctrl To = 1;
+# A control representing a hiding operation of a single action
+ctrl Hide = 1;
+# A control to represent a renaming operation. Must contain a From Control which itself must contain a To Control.
+ctrl Rename = 0;
+
+# A control to wrap the current execution state, i.e. the current process and the current translation table
+# TODO: Is this still necessary, especially in combination with the Par control?
+ctrl Current = 0;

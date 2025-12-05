@@ -1,0 +1,44 @@
+# Here we define the reaction system for the generated bigraph
+begin brs
+    # This set of strings must be generated from the actions encountered in the CCS processes
+    string action_names = {"a", "b", "c"};
+
+    # The initial bigraph corresponds to the `start` bigraph, composing the bigraphs of the actions, the processes and the execution.
+    init start;
+
+    # This set of rules must (unfortunately) be generated, since bigrapher doesn't support constructing cross products of sets and mapping them to the rules
+    # something like
+    #
+    # (string, string) action_pairs = cross(action_names, action_names)
+    # rename(action_pairs)
+    #
+    # would make this way more convenient.
+
+    # TODO: sort these rules correctly.
+    rules = [
+        {
+            deref, 
+            hide(action_names),
+            hide_renamed(action_names),
+            rename("a", "b"), rename("a", "c"), 
+            rename("b", "a"), rename("b", "c"), 
+            rename("c", "a"), rename("c", "a"), 
+            rename_renamed("a", "b"), rename_renamed("a", "c"), 
+            rename_renamed("b", "a"), rename_renamed("b", "c"), 
+            rename_renamed("c", "a"), rename_renamed("c", "a")
+        },
+        {
+            hide_done(action_names),
+            rename_done("a", "b"), rename_done("a", "c"), 
+            rename_done("b", "a"), rename_done("b", "c"), 
+            rename_done("c", "a"), rename_done("c", "a")
+        },
+        {
+            step_tau,
+            step_renamed(action_names)
+        },
+        {           
+            step(action_names)
+        }
+    ];
+end

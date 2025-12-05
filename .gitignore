@@ -217,3 +217,5 @@ __marimo__/
 
 # Bigraph stuff
 *.big
+# However, include the templates
+!ccs2bigraph/templates/*.big

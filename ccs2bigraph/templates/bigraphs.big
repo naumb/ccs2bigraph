@@ -1,0 +1,23 @@
+big current = 
+    Current.(
+        # Reference to initial process
+        # This control's link will be replaced with a link to the actual initial process.
+          Ref{proc_a} 
+        # Translation Table in default setup (i.e. each action is translated to itself (except tau, which is always tau))
+        | Translation.(From{a}.To{a}.1 | From{b}.To{b}.1 | From{c}.To{c}.1) 
+    );
+
+
+big proc_a = Proc{proc_a}.Do{a}.Do{b}.Do{c}.Rename.From{a}.To{b}.Rename.From{b}.To{c}.Ref{proc_a};
+
+big all_procs = Procs.(proc_a);
+
+big all_actions = 
+    Actions.(
+          Action{a}.Name("a") 
+        | Action{b}.Name("b") 
+        | Action{c}.Name("c") 
+        | Tau{tau}
+    );
+
+big start = current || all_procs || all_actions;

@@ -1,0 +1,170 @@
+# Derefencing a process reference
+react deref = 
+    # When the current execution references another process via `Ref{name}` ...
+    Current.(Ref{name} | Translation.id) || Procs.(Proc{name}.id | id)
+    ->
+    # The contents of Procs.Proc{name} will be copied to resolve this reference
+    # All other parts (esp. Translations and the processes) remain intact.
+    Current.(id | Translation.id) || Procs.(Proc{name}.id | id)
+    @[1, 0, 1, 2]; 
+
+# Engage in actions. These rules are similar to each other.
+# They all remove the control nested under current and remove it from the bigraph.
+# It is asserted, that these controls are linked to actual Actions via the {action} link.
+# They are parameterized in the actions name, mostly for convenience and corresponding information in the resulting LTS.
+# First, "simple" Do-Actions.
+# TODO: Get rid of this.
+fun react step(name) =
+       Current.(Do{action}.id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    ->
+       Current.(id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    @[0, 1, 2];
+
+# CCS semantics
+# TODO: Include `Alt` and `Par` Controls.
+# TODO: Is `Current` still necessary? Could also be a outer `Par`-Wrapper.
+# Send actions
+fun react send(name) =
+       Current.(Send{action}.id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    ->
+       Current.(id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    @[0, 1, 2];
+
+# Recv actions
+fun react recv(name) =
+       Current.(Get{action}.id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    ->
+       Current.(id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    @[0, 1, 2];
+
+# TODO: Include reaction rule that syncronizes on a send and a get action
+# TODO: Maybe also include a modified semantic to see the syncronized action (since in CCS such synchronizations result in tau actions)
+
+# Engage in hidden actions. Once again, these rules differ just in the type of the action.
+# It is asserted that the current Action is translated the internal Tau action.
+react step_tau = 
+       Current.(Do{action}.id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    ->
+       Current.(id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    @[0, 1, 2, 3];
+
+react send_tau = 
+       Current.(Send{action}.id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    ->
+       Current.(id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    @[0, 1, 2, 3];
+
+react recv_tau = 
+       Current.(Recv{action}.id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    ->
+       Current.(id | Translation.(From{action}.To{tau}.1 | id))
+    || Actions.(Action{action}.id | Tau{tau} | id)
+    @[0, 1, 2, 3];
+
+# Engage in renamed actions. Same as above, these rules differ on the type of the action.
+# Similar to Hiding, we assert that there is a corresponding translation in the translation table
+# Once again, we are parametric in the Actions (final) name to support evaluation in the LTS
+fun react step_renamed(name) =
+       Current.(Do{orig}.id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    ->
+       Current.(id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    @[0, 1, 2, 3];
+
+fun react send_renamed(name) =
+       Current.(Send{orig}.id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    ->
+       Current.(id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    @[0, 1, 2, 3];
+
+fun react recv_renamed(name) =
+       Current.(Recv{orig}.id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    ->
+       Current.(id | Translation.(From{orig}.To{current}.1 | id)) 
+    || Actions.(Action{orig}.id | Action{current}.Name(name) | id)
+    @[0, 1, 2, 3];
+
+# Operations
+# Hiding - what to do when encountering a `Hide` control
+# Note that there may be multiple rules that need to be changed, so we do not remove the `Hide` control immediately
+# Case 1:
+fun react hide(name) = 
+    # The corresponding action is not renamed yet (or somehow came back to its original value) ... 
+       Current.(Hide{action}.id | Translation.(From{action}.To{action}.1 | id)) 
+    || Actions.(Action{action}.Name(name) | Tau{tau} | id)
+    ->
+    # So we rewrite our translation table to change it to Tau.
+       Current.(Hide{action}.id | Translation.(From{action}.To{tau}.1 | id)) 
+    || Actions.(Action{action}.Name(name) | Tau{tau} | id)
+    @[0, 1, 2];
+
+# Case 2:
+fun react hide_renamed(name) = 
+    # We hide a renamed action. 
+       Current.(Hide{action}.id | Translation.(From{orig}.To{action}.1 | id)) 
+    || Actions.(Action{action}.Name(name) | Tau{tau} | Action{orig}.id | id)
+    ->
+    # This means we must also hide the original action which was renamed to our hiding target
+       Current.(Hide{action}.id | Translation.(From{orig}.To{tau}.1 | id)) 
+    || Actions.(Action{action}.Name(name) | Tau{tau} | Action{orig}.id | id)
+    @[0, 1, 2, 3];
+
+# Finalization: When the rules above have been applied, we can remove the `Hide` control from the process.
+# Once again, for convenience, we included the name of the action which hiding is finalized.
+fun react hide_done(name) =
+       Current.(Hide{action}.id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    ->
+       Current.(id | Translation.id) 
+    || Actions.(Action{action}.Name(name) | id)
+    @[0, 1, 2];
+
+# Renaming - what to do when encountering a `Rename.From{...}.To{...}` subgraph
+# Note that there may be multiple rules that need to be changed, so we do not remove the subgraph immediately
+# Case 1:
+fun react rename(old, new) =
+    # The corresponding action is not renamed yet (or somehow came back to its original value)
+       Current.(Rename.From{old}.To{new}.id | Translation.(From{old}.To{old}.1 | id)) 
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | id)
+    -> 
+    # So we rewrite our translation table to change it to the new action.   
+       Current.(Rename.From{old}.To{new}.id | Translation.(From{old}.To{new}.1 | id))
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | id)
+    @[0, 1, 2];
+
+# Case 2:
+fun react rename_renamed(old, new) = 
+    # We rename a already renamed action. 
+       Current.(Rename.From{old}.To{new}.id | Translation.(From{orig}.To{old}.1 | id)) 
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | Action{orig}.id | id)
+    ->
+    # This means we must also rename the original action to the new action
+       Current.(Rename.From{old}.To{new}.id | Translation.(From{orig}.To{new}.1 | id)) 
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | Action{orig}.id | id)
+    @[0, 1, 2, 3];
+
+# Finalization: When the rules above have been applied, we can remove the `Rename.From{...}.To{...}` subgraph from the process.
+# Once again, for convenience, we included the name of the actions which constitute the renameing when it is finalized.
+fun react rename_done(old, new) =
+       Current.(Rename.From{old}.To{new}.id | Translation.id) 
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | id)
+    ->
+       Current.(id | Translation.id) 
+    || Actions.(Action{old}.Name(old) | Action{new}.Name(new) | id)
+    @[0, 1, 2];
+
